@@ -6,7 +6,11 @@
 **/APCEMM_out/
 **/*.cmake
 **/*.tcl
-
+**/APCEMM-sweep*
+**/APCEMM-NIPC-times*
+**/APCEMM-NIPC-expansion*
+**/APCEMM-NIPC-samples_r*
+**/APCEMM-NIPC-evaluations*
 APCEMM
 unittest
 
@@ -82,3 +86,4 @@ CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 
+/Code.v05-00/vcpkg_installed/
