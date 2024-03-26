@@ -235,6 +235,8 @@ def read_APCEMM_data(directory, output_id):
         - "Number Ice Particles" (#/m)
         - "Ice Mass" (Ice mass of contrail section per unit length (kg/m))
         - "intOD" (Vertical optical depth integrated over the grid)
+        - "Altitude" (grid cell altitude in m)
+        - "RHi" (Relative humidity wrt ice in decimal NOT percentage)
     """
     t_mins = []
     output = []
@@ -250,6 +252,10 @@ def read_APCEMM_data(directory, output_id):
 
             if (output_id == "Horizontal optical depth") | (output_id == "Vertical optical depth"):
                 output.append(ds[output_id])
+            elif output_id == "Altitude":
+                output.append(ds[output_id].isel(y=0).item())
+            elif (output_id == "RHi"):
+                output.append(ds[output_id].isel(x=0,y=0).item() * 100)
             else:
                 output.append(ds.variables[output_id][:].values[0])
 
@@ -374,7 +380,7 @@ def eval_APCEMM(NIPC_vars, directory, output_id = "Number Ice Particles"):
     reset_APCEMM_outputs(directory)
 
     # Run APCEMM
-    os.system('./../../Code.v05-00/APCEMM input.yaml')
+    os.system('./../../build/APCEMM input.yaml')
 
     # Read the output
     t_mins, output = read_APCEMM_data(directory, output_id=output_id)
@@ -416,24 +422,50 @@ MAIN FUNCTION
 if __name__ == "__main__" :
     # Chaospy code from https://chaospy.readthedocs.io/en/master/user_guide/advanced_topics/generalized_polynomial_chaos.html
     # Using point collocation
-    timing = False
-    output_id = "Number Ice Particles"
-    runs = 100
+    # timing = False
+    # output_id = "Number Ice Particles"
+    # runs = 100
 
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = directory + "/APCEMM_out"
+    directory = directory + "/APCEMM_out/"
 
-    RHi_default = 150
-    T_default = 217
-    var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
-    var_T = NIPC_var("temp_K", T_default)
-    times, evaluations = eval_APCEMM([var_RH, var_T], directory = directory, output_id=output_id)
+    # RHi_default = 150
+    # T_default = 217
+    # var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
+    # var_T = NIPC_var("temp_K", T_default)
+    # times, evaluations = eval_APCEMM([var_RH, var_T], directory = directory, output_id=output_id)
 
-    # Save the evaluations
-    DF = pd.DataFrame(evaluations)
-    DF.to_csv(directory + "APCEMM-debug-evaluations.csv")
+    # # Save the time vector
+    # DF = pd.DataFrame(times)
+    # DF.to_csv(directory + "APCEMM-debug-times.csv")
+
+    times, evals = read_APCEMM_data(directory,"Ice Mass")
 
     # Save the time vector
     DF = pd.DataFrame(times)
-    DF.to_csv(directory + "APCEMM-debug-times.csv")
+    DF.to_csv(directory + "APCEMM-t.csv")
+
+    # Save the Ice Mass
+    DF = pd.DataFrame(evals)
+    DF.to_csv(directory + "APCEMM-I.csv")
+
+    # Save the Ice Crystal Number
+    times, evals = read_APCEMM_data(directory,"Number Ice Particles")
+    DF = pd.DataFrame(evals)
+    DF.to_csv(directory + "APCEMM-N.csv")
+
+    # Save the Altitude
+    times, evals = read_APCEMM_data(directory,"Altitude")
+    DF = pd.DataFrame(evals)
+    DF.to_csv(directory + "APCEMM-alt.csv")
+
+    # Save the RHi
+    times, evals = read_APCEMM_data(directory,"RHi")
+    DF = pd.DataFrame(evals)
+    DF.to_csv(directory + "APCEMM-RHi.csv")
+
+    
+
+
+
 
