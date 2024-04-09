@@ -102,18 +102,18 @@ AEROSOL MENU:
 # Exactly one of "Init RH from met." and "Impose moist layer depth" must be true
 METEOROLOGY MENU:
   METEOROLOGICAL INPUT SUBMENU:
-    Use met. input (T/F): F
-    Met input file path (string): /path/to/input/
+    Use met. input (T/F): T
+    Met input file path (string): op-APCEMM-met.nc
     Time series data timestep [hr] (double): 1.0
     Init temp. from met. (T/F): T
     Temp. time series input (T/F): T
     Interpolate temp. met. data (T/F): T
-    Init RH from met. (T/F): F
-    RH time series input (T/F): T
+    Init RH from met. (T/F): T
+    RH time series input (T/F): F
     Interpolate RH met. data (T/F): T
     Init wind shear from met. (T/F): T
     Wind shear time series input (T/F): T
-    Interpolate shear met. data (T/F): T
+    Interpolate shear met. data (T/F): F
     Init vert. veloc. from met. data (T/F): F
     Vert. veloc. time series input (T/F): F
     Interpolate vert. veloc. met. data (T/F): F
@@ -124,7 +124,7 @@ METEOROLOGY MENU:
       Humidity scaling constant b (double): 1.635
   #- OR -------------------+
   IMPOSE MOIST LAYER DEPTH SUBMENU:
-    Impose moist layer depth (T/F): T
+    Impose moist layer depth (T/F): F
     Moist layer depth [m] (double): 1000
   #--- OR -----------------+
   IMPOSE LAPSE RATE SUBMENU:
