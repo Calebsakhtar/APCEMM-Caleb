@@ -12,6 +12,86 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
+"""
+**********************************
+DATA PROCESSING FUNCTIONS
+**********************************
+"""
+def evaluate_proportion_in_contrail(rel_tol, N_grid, N_total):
+    contains_contrail = np.where(N_grid >= N_total * rel_tol, 1, 0)
+    N_contrail_current = 0.
+
+    for i in range(N_grid.shape[0]):
+        for j in range(N_grid.shape[1]):
+            N_contrail_current += N_grid[i, j] * contains_contrail[i,j]
+
+    return N_contrail_current / N_total
+
+
+def find_contrail_cells(N_grid, N_total):
+    # Calculates what cells are a part of the contrail and the indexes corresponding to the
+    # contrail center
+    #
+    # Uses the binomial distribution: https://en.wikipedia.org/wiki/Bisection_method#Algorithm
+
+    a = 0.
+    b = 1.
+    soln = 0.
+
+    target_proportion = 0.95
+
+    num_evals = 0
+    num_evals_max = 1e3
+    tol = 1e-14
+
+    while (num_evals < num_evals_max + 1):
+        c = (a + b) / 2
+
+        if (c == 0) or (abs((b - a) / 2) < tol):
+            soln = c
+            break
+
+        f_a = evaluate_proportion_in_contrail(rel_tol=a, N_grid=N_grid, 
+                                              N_total=N_total) - target_proportion
+        f_b = evaluate_proportion_in_contrail(rel_tol=b, N_grid=N_grid, 
+                                              N_total=N_total) - target_proportion
+        f_c = evaluate_proportion_in_contrail(rel_tol=c, N_grid=N_grid, 
+                                              N_total=N_total) - target_proportion
+        
+        if np.sign(f_c) == np.sign(f_a):
+            a = c
+        else:
+            b = c
+
+        num_evals += 1
+
+    if num_evals == num_evals_max:
+        soln_list = np.array([a, b, c])
+        eval_list = np.array([abs(f_a), abs(f_b), abs(f_c)])
+
+        soln = soln_list[np.argmin(eval_list)]
+
+    return np.where(N_grid >= N_total * soln, N_grid, 0)
+
+def find_contrail_center(N_grid):
+    N_total = 0.
+    sum_i = 0.
+    sum_j = 0.
+    
+    for i in range(N_grid.shape[0]):
+        for j in range(N_grid.shape[1]):
+            current_N = N_grid[i,j]
+            
+            N_total += current_N
+            sum_i += i * current_N
+            sum_j += j * current_N
+
+    i_hat = np.rint(sum_i / N_total)
+    j_hat = np.rint(sum_j / N_total)
+
+    return (i_hat, j_hat)
+
+
 
 """
 **********************************
@@ -226,7 +306,7 @@ def read_nc_file(filename):
     print(ds.variables['intOD'][:])
 
     return ds
-    
+
 def read_APCEMM_data(directory, output_id):
     """ 
     Supported output_id values:
@@ -250,12 +330,39 @@ def read_APCEMM_data(directory, output_id):
             hrs = int(tokens[-2][-4:-2])
             t_mins.append(hrs*60 + mins)
 
+            aerosols = ds["Ice aerosol particle number"].to_numpy() # Convert to numpy for speedup
+
+            x_centers = ds["x"]
+            x_deltas = []
+            for i in range(len(x_centers) - 1):
+                x_deltas.append(x_centers[i + 1].item() - x_centers[i].item())
+            x_deltas.append(x_deltas[-1])
+
+            y_centers = ds["y"]
+            y_deltas = []
+            for i in range(len(y_centers) - 1):
+                y_deltas.append(y_centers[i + 1].item() - y_centers[i].item())
+            y_deltas.append(y_deltas[-1])
+
+            N_grid = np.ones(np.shape(aerosols))
+            N_total = 0
+            for i in range(len(y_centers)):
+                y_delta = y_deltas[i]
+                for j in range(len(x_centers)):
+                    x_delta = x_deltas[j]
+
+                    N_grid[i, j] = aerosols[i, j] * x_delta * y_delta * 1e6 # 1/cm^3 to 1/m^3
+                    N_total += N_grid[i, j]
+
+            N_grid_masked = find_contrail_cells(N_grid = N_grid, N_total=N_total)
+            centre = find_contrail_center(N_grid_masked)
+
             if (output_id == "Horizontal optical depth") | (output_id == "Vertical optical depth"):
                 output.append(ds[output_id])
             elif output_id == "Altitude":
-                output.append(ds[output_id].isel(y=0).item())
+                output.append(ds[output_id].isel(y=-1).item())
             elif (output_id == "RHi"):
-                output.append(ds[output_id].isel(x=0,y=0).item() * 100)
+                output.append(ds[output_id].isel(x=-1,y=-1).item() * 100)
             else:
                 output.append(ds.variables[output_id][:].values[0])
 
@@ -422,18 +529,18 @@ MAIN FUNCTION
 if __name__ == "__main__" :
     # Chaospy code from https://chaospy.readthedocs.io/en/master/user_guide/advanced_topics/generalized_polynomial_chaos.html
     # Using point collocation
-    # timing = False
-    # output_id = "Number Ice Particles"
-    # runs = 100
+    timing = False
+    output_id = "Number Ice Particles"
+    runs = 100
 
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     directory = directory + "/APCEMM_out/"
 
-    # RHi_default = 150
-    # T_default = 217
-    # var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
-    # var_T = NIPC_var("temp_K", T_default)
-    # times, evaluations = eval_APCEMM([var_RH, var_T], directory = directory, output_id=output_id)
+    RHi_default = 150
+    T_default = 217
+    var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
+    var_T = NIPC_var("temp_K", T_default)
+    #times, evaluations = eval_APCEMM([var_RH, var_T], directory = directory, output_id=output_id)
 
     # # Save the time vector
     # DF = pd.DataFrame(times)
