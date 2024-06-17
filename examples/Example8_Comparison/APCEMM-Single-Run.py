@@ -292,95 +292,12 @@ def write_APCEMM_NIPC_vars(NIPC_vars):
 READING APCEMM OUTPUTS FUNCTIONS
 **********************************
 """
-# This code is taken from the APCEMM example files
-def read_nc_file(filename):
-    ip_filepath_base = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    ip_filepath_base = ip_filepath_base + "/APCEMM_out"
 
-    ip_filepath = os.path.join(ip_filepath_base,filename)
-
-    ds = nc.Dataset(ip_filepath)
-
-    print(ds.variables)
-
-    print(ds.variables['intOD'][:])
-
-    return ds
-
-def read_APCEMM_data(directory, output_id):
-    """ 
-    Supported output_id values:
-        - "Horizontal optical depth"
-        - "Vertical optical depth"
-        - "Number Ice Particles" (#/m)
-        - "Ice Mass" (Ice mass of contrail section per unit length (kg/m))
-        - "intOD" (Vertical optical depth integrated over the grid)
-        - "Altitude" (grid cell altitude in m)
-        - "RHi" (Relative humidity wrt ice in decimal NOT percentage)
-    """
-    t_mins = []
-    output = []
-
-    for file in sorted(os.listdir(directory)):
-        if(file.startswith('ts_aerosol') and file.endswith('.nc')):
-            file_path = os.path.join(directory,file)
-            ds = xr.open_dataset(file_path, engine = "netcdf4", decode_times = False)
-            tokens = file_path.split('.')
-            mins = int(tokens[-2][-2:])
-            hrs = int(tokens[-2][-4:-2])
-            t_mins.append(hrs*60 + mins)
-
-            aerosols = ds["Ice aerosol particle number"].to_numpy() # Convert to numpy for speedup
-
-            x_centers = ds["x"]
-            x_deltas = []
-            for i in range(len(x_centers) - 1):
-                x_deltas.append(x_centers[i + 1].item() - x_centers[i].item())
-            x_deltas.append(x_deltas[-1])
-
-            y_centers = ds["y"]
-            y_deltas = []
-            for i in range(len(y_centers) - 1):
-                y_deltas.append(y_centers[i + 1].item() - y_centers[i].item())
-            y_deltas.append(y_deltas[-1])
-
-            N_grid = np.ones(np.shape(aerosols))
-            N_total = 0
-            for i in range(len(y_centers)):
-                y_delta = y_deltas[i]
-                for j in range(len(x_centers)):
-                    x_delta = x_deltas[j]
-
-                    N_grid[i, j] = aerosols[i, j] * x_delta * y_delta * 1e6 # 1/cm^3 to 1/m^3
-                    N_total += N_grid[i, j]
-
-            N_grid_masked = find_contrail_cells(N_grid = N_grid, N_total=N_total)
-            centre = find_contrail_center(N_grid_masked)
-
-            if (output_id == "Horizontal optical depth") | (output_id == "Vertical optical depth"):
-                output.append(ds[output_id])
-            elif output_id == "Altitude":
-                output.append(ds[output_id].isel(y=-1).item())
-            elif (output_id == "RHi"):
-                output.append(ds[output_id].isel(x=-1,y=-1).item() * 100)
-            else:
-                output.append(ds.variables[output_id][:].values[0])
-
-    if len(t_mins) == 0:
-        t_mins.append(0)
-
-    while len(t_mins) < 37:
-        t_mins.append(t_mins[-1] + 10)
-
-    while len(output) < 37:
-        output.append(0)
-
-    return t_mins, output
-
-def process_and_save_outputs(nc_directory = "APCEMM_out/", filepath = "outputs/APCEMM-test-outputs.csv"):
-
+def process_and_save_outputs(filepath = "/outputs/APCEMM-test-outputs.csv"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = directory + "/" + nc_directory
+    directory = directory + "/APCEMM_out/"
+
+    filepath = directory + filepath
     
     # Initialise empty lists for the outputs of interest
     t_hrs = []
@@ -466,7 +383,10 @@ def process_and_save_outputs(nc_directory = "APCEMM_out/", filepath = "outputs/A
 
     return data
 
-def reset_APCEMM_outputs(directory):
+def reset_APCEMM_outputs():
+    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    directory = directory + "/APCEMM_out/"
+
     for file in sorted(os.listdir(directory)):
         if(file.startswith('ts_aerosol') and file.endswith('.nc')):
             file_path = os.path.join(directory,file)
@@ -482,6 +402,8 @@ def removeLow(arr, cutoff = 1e-3):
     func = lambda x: (x > cutoff) * x
     vfunc = np.vectorize(func)
     return vfunc(arr)
+
+
 
 """
 **********************************
@@ -546,7 +468,8 @@ class NIPC_var:
         self.name = name
         self.data = data
 
-def eval_APCEMM(NIPC_vars, directory, output_id = "Number Ice Particles"):
+def eval_APCEMM(NIPC_vars = [], met_filepath = "",
+                output_filepath = "outputs/APCEMM-test-outputs.csv"):
     # Supported NIPC_var.names:
     #   - "temp_K"
     #   - "RH_percent"
@@ -569,44 +492,16 @@ def eval_APCEMM(NIPC_vars, directory, output_id = "Number Ice Particles"):
     # Default the variables
     default_APCEMM_vars()
 
-    # Write the specific variables one by one
-    write_APCEMM_NIPC_vars(NIPC_vars)
+    # # Write the specific variables one by one
+    # write_APCEMM_NIPC_vars(NIPC_vars)
 
     # Eliminate the output files
-    reset_APCEMM_outputs(directory)
+    reset_APCEMM_outputs()
 
     # Run APCEMM
     os.system('./../../build/APCEMM input.yaml')
 
-    # Read the output
-    t_mins, output = read_APCEMM_data(directory, output_id=output_id)
-
-    # Return the output
-    return t_mins, output
-
-# The model NIPC is being applied on
-def eval_model_NIPC(sample, directory, output_id = "Number Ice Particles"):
-    if sample.ndim < 1:
-        sample = np.array([sample])
-
-    var_RH = NIPC_var("RH_percent", sample[0])
-        
-    if len(sample) > 1:
-        var_T = NIPC_var("temp_K", sample[1])
-        NIPC_vars = [var_RH, var_T]
-    else:
-        NIPC_vars = [var_RH]
-
-    # Read the output
-    t_mins, output = eval_APCEMM(NIPC_vars=NIPC_vars, 
-                                 directory=directory, output_id=output_id)
-
-    # Return the integrated optical depth
-    return output
-
-# See Equation A.5 from FYR
-def transform(samples, distribution_input, distribution_germ):
-    return distribution_input.inv(distribution_germ.fwd(samples))
+    return process_and_save_outputs()
 
 def test():
     # Chaospy code from https://chaospy.readthedocs.io/en/master/user_guide/advanced_topics/generalized_polynomial_chaos.html
@@ -627,31 +522,6 @@ def test():
     # # Save the time vector
     # DF = pd.DataFrame(times)
     # DF.to_csv(directory + "APCEMM-debug-times.csv")
-
-    times, evals = read_APCEMM_data(directory,"Ice Mass")
-
-    # Save the time vector
-    DF = pd.DataFrame(times)
-    DF.to_csv(directory + "APCEMM-t.csv")
-
-    # Save the Ice Mass
-    DF = pd.DataFrame(evals)
-    DF.to_csv(directory + "APCEMM-I.csv")
-
-    # Save the Ice Crystal Number
-    times, evals = read_APCEMM_data(directory,"Number Ice Particles")
-    DF = pd.DataFrame(evals)
-    DF.to_csv(directory + "APCEMM-N.csv")
-
-    # Save the Altitude
-    times, evals = read_APCEMM_data(directory,"Altitude")
-    DF = pd.DataFrame(evals)
-    DF.to_csv(directory + "APCEMM-alt.csv")
-
-    # Save the RHi
-    times, evals = read_APCEMM_data(directory,"RHi")
-    DF = pd.DataFrame(evals)
-    DF.to_csv(directory + "APCEMM-RHi.csv")
 
 """
 **********************************
