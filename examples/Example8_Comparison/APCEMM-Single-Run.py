@@ -508,11 +508,45 @@ def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs\\met\\test-APCEMM-met.nc"
 
     # Copy the relevant met file to the example root folder
     set_up_met(met_filepath=met_filepath)
-    
+
     # Run APCEMM
     os.system('./../../build/APCEMM input.yaml')
 
     return process_and_save_outputs()
+
+def run_from_met(mode = "sweep"):
+    """ Mode can be "sweep", "matrix", or "both" """
+
+    if mode == "both":
+        run_from_met(mode = "sweep")
+        run_from_met(mode = "matrix")
+        return 1
+
+    if (mode != "sweep") & (mode != "matrix"):
+        raise ValueError("Invalid input mode in run_from_met()")
+    
+    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    met_directory_iter = os.path.join(directory, "inputs\\met\\" + mode + "\\")
+    met_directory_iter = os.fsencode(met_directory_iter)
+    op_directory = "outputs\\" + mode + "\\"
+        
+    i = 1
+    for file in os.listdir(met_directory_iter):
+        met_filename = os.fsdecode(file)
+        met_filepath = os.path.join("inputs\\met\\" + mode + "\\", met_filename)
+
+        case_name = met_filename[:-7]
+        op_filepath = os.path.join(op_directory, case_name + "-OP.csv")
+
+        eval_APCEMM(
+            met_filepath = met_filepath,
+            output_filepath = op_filepath
+        )
+
+        print(str(i) + " " + mode + " run(s) done")
+        i += 1
+
+    return 1
 
 def test():
     # Chaospy code from https://chaospy.readthedocs.io/en/master/user_guide/advanced_topics/generalized_polynomial_chaos.html
@@ -533,6 +567,4 @@ MAIN FUNCTION
 **********************************
 """
 if __name__ == "__main__" :
-    # process_and_save_outputs()
-    set_up_met()
-
+    run_from_met(mode = "both")
