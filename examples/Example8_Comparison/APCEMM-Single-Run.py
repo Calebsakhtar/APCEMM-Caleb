@@ -295,9 +295,9 @@ READING APCEMM OUTPUTS FUNCTIONS
 
 def process_and_save_outputs(filepath = "/outputs/APCEMM-test-outputs.csv"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = directory + "/APCEMM_out/"
+    directory = os.path.join(directory, "/APCEMM_out/")
 
-    filepath = directory + filepath
+    filepath = os.path.join(directory, filepath)
     
     # Initialise empty lists for the outputs of interest
     t_hrs = []
@@ -385,7 +385,7 @@ def process_and_save_outputs(filepath = "/outputs/APCEMM-test-outputs.csv"):
 
 def reset_APCEMM_outputs():
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = directory + "/APCEMM_out/"
+    directory = os.path.join(directory, "/APCEMM_out/")
 
     for file in sorted(os.listdir(directory)):
         if(file.startswith('ts_aerosol') and file.endswith('.nc')):
@@ -510,18 +510,11 @@ def test():
     output_id = "Number Ice Particles"
     runs = 100
 
-    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = directory + "/APCEMM_out/"
-
     RHi_default = 150
     T_default = 217
     var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
     var_T = NIPC_var("temp_K", T_default)
-    # times, evaluations = eval_APCEMM([var_RH, var_T], directory = directory, output_id=output_id)
-
-    # # Save the time vector
-    # DF = pd.DataFrame(times)
-    # DF.to_csv(directory + "APCEMM-debug-times.csv")
+    # times, evaluations = eval_APCEMM([var_RH, var_T])
 
 """
 **********************************
