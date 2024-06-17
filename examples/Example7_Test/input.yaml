@@ -1,6 +1,6 @@
 SIMULATION MENU:
   # Only one of parameter sweep or MC simulation can be on.
-  OpenMP Num Threads (positive int): 8
+  OpenMP Num Threads (positive int): 6
   PARAM SWEEP SUBMENU:
     Parameter sweep (T/F): T
   #-OR---------------
@@ -33,21 +33,21 @@ PARAMETER MENU:
 
   # Monte Carlo simulation : min:max 
   #                        : Example: 200:240 will generate values for the parameter in between 200 and 240
-  Plume Process [hr] (double): 12
+  Plume Process [hr] (double): 6
   # Temperature, RH, and wind shear can be overwritten if using meteorological input files
   METEOROLOGICAL PARAMETERS SUBMENU:
     Temperature [K] (double): 217
-    R.Hum. wrt water [%] (double): 40
-    Pressure [hPa] (double): 266.04
+    R.Hum. wrt water [%] (double): 86.35250621242163
+    Pressure [hPa] (double): 227
     Horiz. diff. coeff. [m^2/s] (double): 15.0
     Verti. diff. [m^2/s] (double): 0.15
     Wind shear [1/s] (double): 0.002
     Brunt-Vaisala Frequency [s^-1] (double): 0.01
   LOCATION AND TIME SUBMENU:
-    LON [deg] (double): -1.99
-    LAT [deg] (double): 53.9
+    LON [deg] (double): -1.58
+    LAT [deg] (double): 53.55
     Emission day [1-365] (int): 1
-    Emission time [hr] (double) : 0.2666666667
+    Emission time [hr] (double) : 14.00
   BACKGROUND MIXING RATIOS SUBMENU:
     NOx [ppt] (double): 5100
     HNO3 [ppt] (double): 81.5
@@ -56,20 +56,20 @@ PARAMETER MENU:
     CH4 [ppm] (double): 1.76
     SO2 [ppt] (double): 7.25
   EMISSION INDICES SUBMENU:
-    NOx [g(NO2)/kg_fuel] (double): 10
-    CO [g/kg_fuel] (double): 1
+    NOx [g(NO2)/kg_fuel] (double): 11.46
+    CO [g/kg_fuel] (double): 1.2
     UHC [g/kg_fuel] (double): 0.6
-    SO2 [g/kg_fuel] (double): 1.2
-    SO2 to SO4 conv [%] (double): 2
-    Soot [g/kg_fuel] (double): 0.08
+    SO2 [g/kg_fuel] (double): 1.0
+    SO2 to SO4 conv [%] (double): 5
+    Soot [g/kg_fuel] (double): 0.008
   Soot Radius [m] (double): 20.0E-09
-  Total fuel flow [kg/s] (double) : 0.895438043
-  Aircraft mass [kg] (double): 63320.9359671823
-  Flight speed [m/s] (double): 265.42
+  Total fuel flow [kg/s] (double) : 1.602
+  Aircraft mass [kg] (double): 224658.4
+  Flight speed [m/s] (double): 250.9
   Num. of engines [2/4] (int): 2 
-  Wingspan [m] (double): 34.32
-  Core exit temp. [K] (double): 553.65
-  Exit bypass area [m^2] (double): 0.9772
+  Wingspan [m] (double): 64.75
+  Core exit temp. [K] (double): 547.3
+  Exit bypass area [m^2] (double): 1.804
 
 TRANSPORT MENU:
   Turn on Transport (T/F): T
