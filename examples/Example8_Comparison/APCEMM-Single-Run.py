@@ -545,9 +545,6 @@ def run_from_met(mode = "sweep"):
         print(str(i) + " " + mode + " run(s) done")
         i += 1
 
-        if i > 4:
-            return 0
-
     return 1
 
 def test():
