@@ -293,9 +293,9 @@ READING APCEMM OUTPUTS FUNCTIONS
 **********************************
 """
 
-def process_and_save_outputs(filepath = "/outputs/APCEMM-test-outputs.csv"):
+def process_and_save_outputs(filepath = "outputs\\APCEMM-test-outputs.csv"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = os.path.join(directory, "/APCEMM_out/")
+    directory = os.path.join(directory, "APCEMM_out\\")
 
     filepath = os.path.join(directory, filepath)
     
@@ -385,7 +385,7 @@ def process_and_save_outputs(filepath = "/outputs/APCEMM-test-outputs.csv"):
 
 def reset_APCEMM_outputs():
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = os.path.join(directory, "/APCEMM_out/")
+    directory = os.path.join(directory, "APCEMM_out\\")
 
     for file in sorted(os.listdir(directory)):
         if(file.startswith('ts_aerosol') and file.endswith('.nc')):
@@ -468,8 +468,11 @@ class NIPC_var:
         self.name = name
         self.data = data
 
-def eval_APCEMM(NIPC_vars = [], met_filepath = "",
-                output_filepath = "outputs/APCEMM-test-outputs.csv"):
+
+
+
+def eval_APCEMM(NIPC_vars = [], met_filepath = "test-APCEMM-met.nc",
+                output_filepath = "outputs\\APCEMM-test-outputs.csv"):
     # Supported NIPC_var.names:
     #   - "temp_K"
     #   - "RH_percent"
@@ -522,5 +525,7 @@ MAIN FUNCTION
 **********************************
 """
 if __name__ == "__main__" :
-    process_and_save_outputs()
+    # process_and_save_outputs()
+    # set_up_met()
+    reset_APCEMM_outputs()
 
