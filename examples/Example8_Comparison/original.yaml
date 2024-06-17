@@ -103,7 +103,7 @@ AEROSOL MENU:
 METEOROLOGY MENU:
   METEOROLOGICAL INPUT SUBMENU:
     Use met. input (T/F): T
-    Met input file path (string): op-APCEMM-met.nc
+    Met input file path (string): current-APCEMM-met.nc
     Time series data timestep [hr] (double): 1.0
     Init temp. from met. (T/F): T
     Temp. time series input (T/F): T
