@@ -1,5 +1,5 @@
 import os
-import chaospy
+# import chaospy
 import shutil
 import os.path
 import pickle
@@ -294,12 +294,11 @@ READING APCEMM OUTPUTS FUNCTIONS
 **********************************
 """
 
-def process_and_save_outputs(filepath = "outputs\\APCEMM-test-outputs.csv"):
+def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = os.path.join(directory, "APCEMM_out\\")
+    op_filepath = os.path.join(directory, filepath)
+    directory = os.path.join(directory, "APCEMM_out/")
 
-    filepath = os.path.join(directory, filepath)
-    
     # Initialise empty lists for the outputs of interest
     t_hrs = []
     width_m = []
@@ -371,7 +370,7 @@ def process_and_save_outputs(filepath = "outputs\\APCEMM-test-outputs.csv"):
     }
 
     DF = pd.DataFrame.from_dict(data)
-    DF.to_csv(filepath)
+    DF.to_csv(op_filepath)
 
     # if len(t_hrs) == 0:
     #     t_hrs.append(0)
@@ -386,7 +385,7 @@ def process_and_save_outputs(filepath = "outputs\\APCEMM-test-outputs.csv"):
 
 def reset_APCEMM_outputs():
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    directory = os.path.join(directory, "APCEMM_out\\")
+    directory = os.path.join(directory, "APCEMM_out/")
 
     for file in sorted(os.listdir(directory)):
         if(file.startswith('ts_aerosol') and file.endswith('.nc')):
@@ -469,15 +468,15 @@ class NIPC_var:
         self.name = name
         self.data = data
 
-def set_up_met(met_filepath = "inputs\\met\\test-APCEMM-met.nc"):
+def set_up_met(met_filepath = "inputs/met/test-APCEMM-met.nc"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     source_filepath = os.path.join(directory, met_filepath)
     destination_filepath = os.path.join(directory, "current-APCEMM-met.nc")
 
     shutil.copyfile(source_filepath, destination_filepath)
 
-def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs\\met\\test-APCEMM-met.nc",
-                output_filepath = "outputs\\APCEMM-test-outputs.csv"):
+def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs/met/test-APCEMM-met.nc",
+                output_filepath = "outputs/APCEMM-test-outputs.csv"):
     # Supported NIPC_var.names:
     #   - "temp_K"
     #   - "RH_percent"
@@ -512,7 +511,7 @@ def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs\\met\\test-APCEMM-met.nc"
     # Run APCEMM
     os.system('./../../build/APCEMM input.yaml')
 
-    return process_and_save_outputs()
+    return process_and_save_outputs(filepath=output_filepath)
 
 def run_from_met(mode = "sweep"):
     """ Mode can be "sweep", "matrix", or "both" """
@@ -526,14 +525,14 @@ def run_from_met(mode = "sweep"):
         raise ValueError("Invalid input mode in run_from_met()")
     
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    met_directory_iter = os.path.join(directory, "inputs\\met\\" + mode + "\\")
+    met_directory_iter = os.path.join(directory, "inputs/met/" + mode + "/")
     met_directory_iter = os.fsencode(met_directory_iter)
-    op_directory = "outputs\\" + mode + "\\"
+    op_directory = "outputs/" + mode + "/"
         
     i = 1
     for file in os.listdir(met_directory_iter):
         met_filename = os.fsdecode(file)
-        met_filepath = os.path.join("inputs\\met\\" + mode + "\\", met_filename)
+        met_filepath = os.path.join("inputs/met/" + mode + "/", met_filename)
 
         case_name = met_filename[:-7]
         op_filepath = os.path.join(op_directory, case_name + "-OP.csv")
@@ -545,6 +544,9 @@ def run_from_met(mode = "sweep"):
 
         print(str(i) + " " + mode + " run(s) done")
         i += 1
+
+        if i > 4:
+            return 0
 
     return 1
 
