@@ -4,6 +4,7 @@ import shutil
 import os.path
 import pickle
 import time
+import shutil
 import numpy as np
 import netCDF4 as nc
 import xarray as xr
@@ -468,10 +469,14 @@ class NIPC_var:
         self.name = name
         self.data = data
 
+def set_up_met(met_filepath = "inputs\\met\\test-APCEMM-met.nc"):
+    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    source_filepath = os.path.join(directory, met_filepath)
+    destination_filepath = os.path.join(directory, "current-APCEMM-met.nc")
 
+    shutil.copyfile(source_filepath, destination_filepath)
 
-
-def eval_APCEMM(NIPC_vars = [], met_filepath = "test-APCEMM-met.nc",
+def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs\\met\\test-APCEMM-met.nc",
                 output_filepath = "outputs\\APCEMM-test-outputs.csv"):
     # Supported NIPC_var.names:
     #   - "temp_K"
@@ -501,6 +506,9 @@ def eval_APCEMM(NIPC_vars = [], met_filepath = "test-APCEMM-met.nc",
     # Eliminate the output files
     reset_APCEMM_outputs()
 
+    # Copy the relevant met file to the example root folder
+    set_up_met(met_filepath=met_filepath)
+    
     # Run APCEMM
     os.system('./../../build/APCEMM input.yaml')
 
@@ -526,6 +534,5 @@ MAIN FUNCTION
 """
 if __name__ == "__main__" :
     # process_and_save_outputs()
-    # set_up_met()
-    reset_APCEMM_outputs()
+    set_up_met()
 
