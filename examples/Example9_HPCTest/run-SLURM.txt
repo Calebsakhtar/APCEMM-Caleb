@@ -62,9 +62,10 @@ module load miniconda/3
 
 conda init bash
 conda activate APCEMM-caleb
+export PATH="/home/ca525/.conda/envs/APCEMM-caleb/bin:$PATH"
 
 #! Full path to application executable: 
-application="python3"
+application="python"
 
 #! Run options for the application:
 options="APCEMM-Single-Run.py"
