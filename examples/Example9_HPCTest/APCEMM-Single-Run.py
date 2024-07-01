@@ -207,11 +207,11 @@ def default_APCEMM_vars():
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     # Read the input file
-    ip_file = open(os.path.join(location,'original.yaml'), 'r')
+    ip_file = open(os.path.join(location,'original.yaml'), 'rb')
     op_lines = ip_file.readlines()
     ip_file.close()
 
-    op_file = open(os.path.join(location,'input.yaml'), 'w')
+    op_file = open(os.path.join(location,'input.yaml'), 'wb')
     op_file.writelines(op_lines)
     op_file.close()
 
@@ -223,7 +223,7 @@ def write_APCEMM_vars(temp_K = 217, RH_percent = 63.94, p_hPa = 250.0, lat_deg =
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     # Read the input file
-    ip_file = open(os.path.join(location,'input.yaml'), 'r')
+    ip_file = open(os.path.join(location,'input.yaml'), 'rb')
     op_lines = ip_file.readlines()
     ip_file.close()
 
@@ -240,7 +240,7 @@ def write_APCEMM_vars(temp_K = 217, RH_percent = 63.94, p_hPa = 250.0, lat_deg =
     op_lines = set_flight_speed_mPers(op_lines, flight_speed_mPers)
     op_lines = set_core_exit_temp_K(op_lines, core_exit_temp_K)
 
-    op_file = open(os.path.join(location,'input.yaml'), 'w')
+    op_file = open(os.path.join(location,'input.yaml'), 'wb')
     op_file.writelines(op_lines)
     op_file.close()
 
@@ -249,7 +249,7 @@ def write_APCEMM_NIPC_vars(NIPC_vars):
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     # Read the input file
-    ip_file = open(os.path.join(location,'input.yaml'), 'r')
+    ip_file = open(os.path.join(location,'input.yaml'), 'rb')
     op_lines = ip_file.readlines()
     ip_file.close()
 
@@ -282,11 +282,26 @@ def write_APCEMM_NIPC_vars(NIPC_vars):
             op_lines = set_p_hPa(op_lines, var.data)
             continue
 
-    op_file = open(os.path.join(location,'input.yaml'), 'w')
+    op_file = open(os.path.join(location,'input.yaml'), 'wb')
     op_file.writelines(op_lines)
     op_file.close()
 
+def write_shear(shear = 2e-3):
+    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+    # Read the input file
+    ip_file = open(os.path.join(location,'input.yaml'), 'rb')
+    op_lines = ip_file.readlines()
+    ip_file.close()
+
+    shear_line = op_lines[43]
+    line_base = shear_line.split(':')[0]
+
+    op_lines[43] = line_base + f": {shear}\n"
+
+    op_file = open(os.path.join(location,'input.yaml'), 'wb')
+    op_file.writelines(op_lines)
+    op_file.close()
 
 """
 **********************************
@@ -537,6 +552,14 @@ def run_from_met(mode = "sweep"):
         case_name = met_filename[:-7]
         op_filepath = os.path.join(op_directory, case_name + "-OP.csv")
 
+        shear_val = 2e-3
+        shear_idx = met_filename.find("shear")
+        if shear_idx > -1:
+            shortened_name = met_filename[shear_idx+6:]
+            shear_val = float(shortened_name.split('_')[0])
+
+        write_shear(shear=shear_val)        
+
         eval_APCEMM(
             met_filepath = met_filepath,
             output_filepath = op_filepath
@@ -567,3 +590,4 @@ MAIN FUNCTION
 """
 if __name__ == "__main__" :
     run_from_met(mode = "both")
+    # write_shear()
