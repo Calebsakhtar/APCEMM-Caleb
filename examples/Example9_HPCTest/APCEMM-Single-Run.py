@@ -589,5 +589,5 @@ MAIN FUNCTION
 **********************************
 """
 if __name__ == "__main__" :
-    # run_from_met(mode = "both")
-    write_shear(2142)
+    run_from_met(mode = "both")
+    # write_shear(2142)
