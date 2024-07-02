@@ -100,7 +100,7 @@ WRITING APCEMM VARIABLES FUNCTIONS
 **********************************
 """
 def set_temp_K(lines : list, T : float) -> list:
-    """Sets thetemperature (T / K) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets thetemperature (T / K) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "    Temperature [K] (double): " + str(T) + "\n"
@@ -109,7 +109,7 @@ def set_temp_K(lines : list, T : float) -> list:
     return newlines
 
 def set_RH_percent(lines : list, RH : float) -> list:
-    """Sets the relative humidity (RH / %) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the relative humidity (RH / %) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "    R.Hum. wrt water [%] (double): " + str(RH) + "\n"
@@ -118,7 +118,7 @@ def set_RH_percent(lines : list, RH : float) -> list:
     return newlines
 
 def set_p_hPa(lines : list, p : float) -> list:
-    """Sets the pressure (p / hPa) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the pressure (p / hPa) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "    Pressure [hPa] (double): " + str(p) + "\n"
@@ -127,7 +127,7 @@ def set_p_hPa(lines : list, p : float) -> list:
     return newlines
 
 def set_coords_deg(lines : list, lon : float, lat : float) -> list:
-    """Sets the longitude (lon / deg) and latitude (lat / deg) 
+    """DEPRECATED Sets the longitude (lon / deg) and latitude (lat / deg) 
     in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
@@ -140,7 +140,7 @@ def set_coords_deg(lines : list, lon : float, lat : float) -> list:
     return newlines
 
 def set_day(lines : list, day : int) -> list:
-    """Sets the day (1-365) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the day (1-365) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "    Emission day [1-365] (int): " + str(day) + "\n"
@@ -149,7 +149,7 @@ def set_day(lines : list, day : int) -> list:
     return newlines
 
 def set_time_hrs_UTC(lines : list, hr : float) -> list:
-    """Sets the time (24hr format UTC) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the time (24hr format UTC) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "    Emission time [hr] (double) : " + str(hr) + "\n"
@@ -158,7 +158,7 @@ def set_time_hrs_UTC(lines : list, hr : float) -> list:
     return newlines
 
 def set_EI_soot_gPerkg(lines : list, EI_soot : float) -> list:
-    """Sets the soot Emissions Index (EI_soot / g of soot per kg of fuel) 
+    """DEPRECATED Sets the soot Emissions Index (EI_soot / g of soot per kg of fuel) 
     in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
@@ -168,7 +168,7 @@ def set_EI_soot_gPerkg(lines : list, EI_soot : float) -> list:
     return newlines
 
 def set_fuel_flow_kgPers(lines : list, fuel_flow : float) -> list:
-    """Sets the fuel flow (fuel_flow / kg per s) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the fuel flow (fuel_flow / kg per s) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "  Total fuel flow [kg/s] (double) : " + str(fuel_flow) + "\n"
@@ -177,7 +177,7 @@ def set_fuel_flow_kgPers(lines : list, fuel_flow : float) -> list:
     return newlines
 
 def set_aircraft_mass_kg(lines : list, aircraft_mass : float) -> list:
-    """Sets the aircraft mass (aircraft_mass / kg) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the aircraft mass (aircraft_mass / kg) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "  Aircraft mass [kg] (double): " + str(aircraft_mass) + "\n"
@@ -186,7 +186,7 @@ def set_aircraft_mass_kg(lines : list, aircraft_mass : float) -> list:
     return newlines
 
 def set_flight_speed_mPers(lines : list, flight_speed : float) -> list:
-    """Sets the flight speed (flight_speed / m/s) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the flight speed (flight_speed / m/s) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "  Flight speed [m/s] (double): " + str(flight_speed) + "\n"
@@ -195,7 +195,7 @@ def set_flight_speed_mPers(lines : list, flight_speed : float) -> list:
     return newlines
 
 def set_core_exit_temp_K(lines : list, T_core_exit : float) -> list:
-    """Sets the core exit temperature (T_core_exit / K) in the lines from input.yaml (lines)"""
+    """DEPRECATED Sets the core exit temperature (T_core_exit / K) in the lines from input.yaml (lines)"""
     newlines = lines.copy()
 
     line =  "  Core exit temp. [K] (double): " + str(T_core_exit) + "\n"
@@ -219,6 +219,7 @@ def write_APCEMM_vars(temp_K = 217, RH_percent = 63.94, p_hPa = 250.0, lat_deg =
                lon_deg = 20.2, day = 20, time_hrs_UTC = 20.0, EI_soot_gPerkg = 0.008,
                fuel_flow_kgPers = 2.8, aircraft_mass_kg = 3.10e+05, 
                flight_speed_mPers = 250.0, core_exit_temp_K = 560.0):
+    """DEPRECATED"""
     
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -245,6 +246,7 @@ def write_APCEMM_vars(temp_K = 217, RH_percent = 63.94, p_hPa = 250.0, lat_deg =
     op_file.close()
 
 def write_APCEMM_NIPC_vars(NIPC_vars):
+    """DEPRECATED"""
     
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
