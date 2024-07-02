@@ -296,10 +296,11 @@ def write_shear(shear = 2e-3):
     op_lines = ip_file.readlines()
     ip_file.close()
 
-    shear_line = op_lines[43]
+    shear_idx = 57
+    shear_line = op_lines[shear_idx]
     line_base = shear_line.split(':')[0]
 
-    op_lines[43] = line_base + f": {shear}\n"
+    op_lines[shear_idx] = line_base + f": {shear}\n"
 
     op_file = open(os.path.join(location,'input.yaml'), 'w', newline='\n')
     op_file.writelines(op_lines)
@@ -592,4 +593,4 @@ MAIN FUNCTION
 """
 if __name__ == "__main__" :
     run_from_met(mode = "both")
-    # write_shear(2142)
+    # write_shear()
