@@ -322,6 +322,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
     width_m = []
     depth_m = []
     tau = []
+    tau_int = []
     I = []
     N = []
 
@@ -341,6 +342,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
             depth_m.append(ds["depth"].values[0])
             I.append(ds["Ice Mass"].values[0])
             N.append(ds["Number Ice Particles"].values[0])
+            tau_int.append(ds["intOD"].values[0])
 
             # Calculate the average grid cell dimensions, and the number of grid cells
             x = ds["x"].values
@@ -375,6 +377,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
     width_m = np.array(width_m)
     depth_m = np.array(depth_m)
     tau = np.array(tau)
+    tau_int = np.array(tau_int)
     I = np.array(I)
     N = np.array(N)
 
@@ -382,6 +385,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
         "Time Since Formation, h": t_hrs,
         "N, # / m": N,
         "Optical Depth, ---": tau,
+        "Integrated Optical Depth, m^2": tau_int,
         "I, kg of ice / m": I,
         "Extinction defined width, m": width_m,
         "Extinction defined depth, m": depth_m,
