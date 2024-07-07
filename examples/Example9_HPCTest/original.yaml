@@ -217,11 +217,11 @@ DIAGNOSTIC MENU:
 ADVANCED OPTIONS MENU:
   # Domain is defined as: X [-XLIM_LEFT, XLIM_RIGHT], Y [-YLIM_DOWN, YLIM_UP]
   GRID SUBMENU:
-    NX (positive int): 2048
-    NY (positive int): 192
-    XLIM_RIGHT (positive double): 5.0e+4 
-    XLIM_LEFT (positive double): 5.0e+4
-    YLIM_UP (positive double): 6.5e+2
+    NX (positive int): 200
+    NY (positive int): 180
+    XLIM_RIGHT (positive double): 1.0e+3
+    XLIM_LEFT (positive double): 1.0e+3
+    YLIM_UP (positive double): 300
     YLIM_DOWN (positive double): 1.5e+3
   INITIAL CONTRAIL SIZE SUBMENU:
     #Depth = BaseDepth + DepthScalingFactor * Default_Depth
