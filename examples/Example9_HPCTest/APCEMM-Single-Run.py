@@ -559,13 +559,13 @@ def run_from_met(mode = "sweep"):
         case_name = met_filename[:-7]
         op_filepath = os.path.join(op_directory, case_name + "-OP.csv")
 
-        shear_val = 2e-3
-        shear_idx = met_filename.find("shear")
-        if shear_idx > -1:
-            shortened_name = met_filename[shear_idx+6:]
-            shear_val = float(shortened_name.split('_')[0])
+        # shear_val = 2e-3
+        # shear_idx = met_filename.find("shear")
+        # if shear_idx > -1:
+        #     shortened_name = met_filename[shear_idx+6:]
+        #     shear_val = float(shortened_name.split('_')[0])
 
-        write_shear(shear=shear_val)        
+        # write_shear(shear=shear_val)        
 
         eval_APCEMM(
             met_filepath = met_filepath,
