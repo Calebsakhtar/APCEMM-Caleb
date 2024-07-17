@@ -596,5 +596,6 @@ MAIN FUNCTION
 **********************************
 """
 if __name__ == "__main__" :
-    run_from_met(mode = "both")
+    # process_and_save_outputs()
+    run_from_met(mode = "sweep")
     # write_shear()
