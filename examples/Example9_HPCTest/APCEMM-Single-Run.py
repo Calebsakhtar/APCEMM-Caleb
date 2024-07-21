@@ -1,5 +1,4 @@
 import os
-# import chaospy
 import shutil
 import os.path
 import pickle
@@ -18,80 +17,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 DATA PROCESSING FUNCTIONS
 **********************************
 """
-def evaluate_proportion_in_contrail(rel_tol, N_grid, N_total):
-    contains_contrail = np.where(N_grid >= N_total * rel_tol, 1, 0)
-    N_contrail_current = 0.
-
-    for i in range(N_grid.shape[0]):
-        for j in range(N_grid.shape[1]):
-            N_contrail_current += N_grid[i, j] * contains_contrail[i,j]
-
-    return N_contrail_current / N_total
-
-
-def find_contrail_cells(N_grid, N_total):
-    # Calculates what cells are a part of the contrail and the indexes corresponding to the
-    # contrail center
-    #
-    # Uses the binomial distribution: https://en.wikipedia.org/wiki/Bisection_method#Algorithm
-
-    a = 0.
-    b = 1.
-    soln = 0.
-
-    target_proportion = 0.95
-
-    num_evals = 0
-    num_evals_max = 1e3
-    tol = 1e-14
-
-    while (num_evals < num_evals_max + 1):
-        c = (a + b) / 2
-
-        if (c == 0) or (abs((b - a) / 2) < tol):
-            soln = c
-            break
-
-        f_a = evaluate_proportion_in_contrail(rel_tol=a, N_grid=N_grid, 
-                                              N_total=N_total) - target_proportion
-        f_b = evaluate_proportion_in_contrail(rel_tol=b, N_grid=N_grid, 
-                                              N_total=N_total) - target_proportion
-        f_c = evaluate_proportion_in_contrail(rel_tol=c, N_grid=N_grid, 
-                                              N_total=N_total) - target_proportion
-        
-        if np.sign(f_c) == np.sign(f_a):
-            a = c
-        else:
-            b = c
-
-        num_evals += 1
-
-    if num_evals == num_evals_max:
-        soln_list = np.array([a, b, c])
-        eval_list = np.array([abs(f_a), abs(f_b), abs(f_c)])
-
-        soln = soln_list[np.argmin(eval_list)]
-
-    return np.where(N_grid >= N_total * soln, N_grid, 0)
-
-def find_contrail_center(N_grid):
-    N_total = 0.
-    sum_i = 0.
-    sum_j = 0.
-    
-    for i in range(N_grid.shape[0]):
-        for j in range(N_grid.shape[1]):
-            current_N = N_grid[i,j]
-            
-            N_total += current_N
-            sum_i += i * current_N
-            sum_j += j * current_N
-
-    i_hat = np.rint(sum_i / N_total)
-    j_hat = np.rint(sum_j / N_total)
-
-    return (i_hat, j_hat)
-
 
 
 """
@@ -99,110 +24,6 @@ def find_contrail_center(N_grid):
 WRITING APCEMM VARIABLES FUNCTIONS
 **********************************
 """
-def set_temp_K(lines : list, T : float) -> list:
-    """DEPRECATED Sets thetemperature (T / K) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    Temperature [K] (double): " + str(T) + "\n"
-    newlines[38] = line
-
-    return newlines
-
-def set_RH_percent(lines : list, RH : float) -> list:
-    """DEPRECATED Sets the relative humidity (RH / %) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    R.Hum. wrt water [%] (double): " + str(RH) + "\n"
-    newlines[39] = line
-
-    return newlines
-
-def set_p_hPa(lines : list, p : float) -> list:
-    """DEPRECATED Sets the pressure (p / hPa) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    Pressure [hPa] (double): " + str(p) + "\n"
-    newlines[40] = line
-
-    return newlines
-
-def set_coords_deg(lines : list, lon : float, lat : float) -> list:
-    """DEPRECATED Sets the longitude (lon / deg) and latitude (lat / deg) 
-    in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    LON [deg] (double): " + str(lon) + "\n"
-    newlines[46] = line
-
-    line =  "    LAT [deg] (double): " + str(lat) + "\n"
-    newlines[47] = line
-
-    return newlines
-
-def set_day(lines : list, day : int) -> list:
-    """DEPRECATED Sets the day (1-365) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    Emission day [1-365] (int): " + str(day) + "\n"
-    newlines[48] = line
-
-    return newlines
-
-def set_time_hrs_UTC(lines : list, hr : float) -> list:
-    """DEPRECATED Sets the time (24hr format UTC) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    Emission time [hr] (double) : " + str(hr) + "\n"
-    newlines[49] = line
-
-    return newlines
-
-def set_EI_soot_gPerkg(lines : list, EI_soot : float) -> list:
-    """DEPRECATED Sets the soot Emissions Index (EI_soot / g of soot per kg of fuel) 
-    in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "    Soot [g/kg_fuel] (double): " + str(EI_soot) + "\n"
-    newlines[63] = line
-
-    return newlines
-
-def set_fuel_flow_kgPers(lines : list, fuel_flow : float) -> list:
-    """DEPRECATED Sets the fuel flow (fuel_flow / kg per s) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "  Total fuel flow [kg/s] (double) : " + str(fuel_flow) + "\n"
-    newlines[65] = line
-
-    return newlines
-
-def set_aircraft_mass_kg(lines : list, aircraft_mass : float) -> list:
-    """DEPRECATED Sets the aircraft mass (aircraft_mass / kg) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "  Aircraft mass [kg] (double): " + str(aircraft_mass) + "\n"
-    newlines[66] = line
-
-    return newlines
-
-def set_flight_speed_mPers(lines : list, flight_speed : float) -> list:
-    """DEPRECATED Sets the flight speed (flight_speed / m/s) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "  Flight speed [m/s] (double): " + str(flight_speed) + "\n"
-    newlines[67] = line
-
-    return newlines
-
-def set_core_exit_temp_K(lines : list, T_core_exit : float) -> list:
-    """DEPRECATED Sets the core exit temperature (T_core_exit / K) in the lines from input.yaml (lines)"""
-    newlines = lines.copy()
-
-    line =  "  Core exit temp. [K] (double): " + str(T_core_exit) + "\n"
-    newlines[70] = line
-
-    return newlines
-
 def default_APCEMM_vars():
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -210,79 +31,6 @@ def default_APCEMM_vars():
     ip_file = open(os.path.join(location,'original.yaml'), 'r', newline='\n')
     op_lines = ip_file.readlines()
     ip_file.close()
-
-    op_file = open(os.path.join(location,'input.yaml'), 'w', newline='\n')
-    op_file.writelines(op_lines)
-    op_file.close()
-
-def write_APCEMM_vars(temp_K = 217, RH_percent = 63.94, p_hPa = 250.0, lat_deg = 20.2, 
-               lon_deg = 20.2, day = 20, time_hrs_UTC = 20.0, EI_soot_gPerkg = 0.008,
-               fuel_flow_kgPers = 2.8, aircraft_mass_kg = 3.10e+05, 
-               flight_speed_mPers = 250.0, core_exit_temp_K = 560.0):
-    """DEPRECATED"""
-    
-    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-    # Read the input file
-    ip_file = open(os.path.join(location,'input.yaml'), 'r', newline='\n')
-    op_lines = ip_file.readlines()
-    ip_file.close()
-
-    # Write the variables to input.yaml
-    op_lines = set_temp_K(op_lines, temp_K)
-    op_lines = set_RH_percent(op_lines, RH_percent)
-    op_lines = set_p_hPa(op_lines, p_hPa)
-    op_lines = set_coords_deg(op_lines, lon_deg, lat_deg)
-    op_lines = set_day(op_lines, day)
-    op_lines = set_time_hrs_UTC(op_lines, time_hrs_UTC)
-    op_lines = set_EI_soot_gPerkg(op_lines, EI_soot_gPerkg)
-    op_lines = set_fuel_flow_kgPers(op_lines, fuel_flow_kgPers)
-    op_lines = set_aircraft_mass_kg(op_lines, aircraft_mass_kg)
-    op_lines = set_flight_speed_mPers(op_lines, flight_speed_mPers)
-    op_lines = set_core_exit_temp_K(op_lines, core_exit_temp_K)
-
-    op_file = open(os.path.join(location,'input.yaml'), 'w', newline='\n')
-    op_file.writelines(op_lines)
-    op_file.close()
-
-def write_APCEMM_NIPC_vars(NIPC_vars):
-    """DEPRECATED"""
-    
-    location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-    # Read the input file
-    ip_file = open(os.path.join(location,'input.yaml'), 'r', newline='\n')
-    op_lines = ip_file.readlines()
-    ip_file.close()
-
-    for var in NIPC_vars:
-        if var.name == "temp_K":
-            op_lines = set_temp_K(op_lines, var.data)
-            continue
-        if var.name == "RH_percent":
-            op_lines = set_RH_percent(op_lines, var.data)
-            continue
-        if var.name == "EI_soot_gPerkg":
-            op_lines = set_EI_soot_gPerkg(op_lines, var.data)
-            continue
-        if var.name == "fuel_flow_kgPers":
-            op_lines = set_fuel_flow_kgPers(op_lines, var.data)
-            continue
-        if var.name == "aircraft_mass_kg":
-            op_lines = set_aircraft_mass_kg(op_lines, var.data)
-            continue
-        if var.name == "flight_speed_mPers":
-            op_lines = set_flight_speed_mPers(op_lines, var.data)
-            continue
-        if var.name == "core_exit_temp_K":
-            op_lines = set_core_exit_temp_K(op_lines, var.data)
-            continue
-        if var.name == "time_hrs_UTC":
-            op_lines = set_time_hrs_UTC(op_lines, var.data)
-            continue
-        if var.name == "p_hPa":
-            op_lines = set_p_hPa(op_lines, var.data)
-            continue
 
     op_file = open(os.path.join(location,'input.yaml'), 'w', newline='\n')
     op_file.writelines(op_lines)
@@ -472,23 +220,6 @@ def convert_RHi_to_RH(T_K, RHi):
 NIPC FUNCTIONS
 **********************************
 """
-class NIPC_var:
-    """
-    Supported NIPC_var.names:
-       - "temp_K": Air Temperature in K
-       - "RH_percent": Relative humidity wrt water in %
-       - "EI_soot_gPerkg": Soot emissions index in grams per kg
-       - "fuel_flow_kgPers": Fuel flow in kg per seconds
-       - "aircraft_mass_kg": Aircraft mass in kg
-       - "flight_speed_mPers": TAS at cruise in m/s
-       - "core_exit_temp_K": Engine core exit temperature in K
-       - "time_hrs_UTC": Time in hours UTC
-       - "p_hPa": Pressure at the flight altitude in hPa
-    """
-        
-    def __init__(self, name, data):
-        self.name = name
-        self.data = data
 
 def set_up_met(met_filepath = "inputs/met/test-APCEMM-met.nc"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -497,32 +228,10 @@ def set_up_met(met_filepath = "inputs/met/test-APCEMM-met.nc"):
 
     shutil.copyfile(source_filepath, destination_filepath)
 
-def eval_APCEMM(NIPC_vars = [], met_filepath = "inputs/met/test-APCEMM-met.nc",
+def eval_APCEMM(met_filepath = "inputs/met/test-APCEMM-met.nc",
                 output_filepath = "outputs/APCEMM-test-outputs.csv"):
-    # Supported NIPC_var.names:
-    #   - "temp_K"
-    #   - "RH_percent"
-    #   - "EI_soot_gPerkg"
-    #   - "fuel_flow_kgPers"
-    #   - "aircraft_mass_kg"
-    #   - "flight_speed_mPers"
-    #   - "core_exit_temp_K"
-    #   - "time_hrs_UTC"
-    #   - "p_hPa"
-    #
-    #
-    # Supported output_id values:
-    #     - "Horizontal optical depth"
-    #     - "Vertical optical depth"
-    #     - "Number Ice Particles" (#/m)
-    #     - "Ice Mass" (Ice mass of contrail section per unit length (kg/m))
-    #     - "intOD" (Vertical optical depth integrated over the grid)
-
     # Default the variables
     default_APCEMM_vars()
-
-    # # Write the specific variables one by one
-    # write_APCEMM_NIPC_vars(NIPC_vars)
 
     # Eliminate the output files
     reset_APCEMM_outputs()
@@ -557,15 +266,7 @@ def run_from_met(mode = "sweep"):
         met_filepath = os.path.join("inputs/met/" + mode + "/", met_filename)
 
         case_name = met_filename[:-7]
-        op_filepath = os.path.join(op_directory, case_name + "-OP.csv")
-
-        # shear_val = 2e-3
-        # shear_idx = met_filename.find("shear")
-        # if shear_idx > -1:
-        #     shortened_name = met_filename[shear_idx+6:]
-        #     shear_val = float(shortened_name.split('_')[0])
-
-        # write_shear(shear=shear_val)        
+        op_filepath = os.path.join(op_directory, case_name + "-OP.csv") 
 
         eval_APCEMM(
             met_filepath = met_filepath,
@@ -576,19 +277,6 @@ def run_from_met(mode = "sweep"):
         i += 1
 
     return 1
-
-def test():
-    # Chaospy code from https://chaospy.readthedocs.io/en/master/user_guide/advanced_topics/generalized_polynomial_chaos.html
-    # Using point collocation
-    timing = False
-    output_id = "Number Ice Particles"
-    runs = 100
-
-    RHi_default = 150
-    T_default = 217
-    var_RH = NIPC_var("RH_percent", convert_RHi_to_RH(T_default, RHi_default))
-    var_T = NIPC_var("temp_K", T_default)
-    # times, evaluations = eval_APCEMM([var_RH, var_T])
 
 """
 **********************************
