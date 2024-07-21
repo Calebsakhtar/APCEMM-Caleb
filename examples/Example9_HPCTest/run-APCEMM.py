@@ -162,7 +162,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
         "Time Since Formation, h": t_hrs,
         "N, # / m": N,
         "Optical Depth, ---": tau,
-        "Integrated Optical Depth, m^2": tau_int,
+        "Integrated Optical Depth, m": tau_int,
         "I, kg of ice / m": I,
         "Extinction defined width, m": width_m,
         "Extinction defined depth, m": depth_m,
