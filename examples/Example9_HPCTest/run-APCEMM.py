@@ -63,6 +63,10 @@ def initialise_output_directory():
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     op_directory = os.path.join(directory, "outputs/")
 
+    # See https://stackoverflow.com/a/273227
+    if not os.path.exists(op_directory):
+        os.makedirs(op_directory)
+
     # Delete the contents of the outputs directory. See https://stackoverflow.com/a/185941
     for file in sorted(os.listdir(op_directory)):
         file_path = os.path.join(op_directory,file)
@@ -84,7 +88,7 @@ def save_APCEMM_raw_outputs(case_name):
         os.makedirs(dest_dir)
 
     # See https://stackoverflow.com/a/3399299
-    for file_name in orig_dir:
+    for file_name in sorted(os.listdir(orig_dir)):
         full_file_name = os.path.join(orig_dir, file_name)
         if os.path.isfile(full_file_name):
             shutil.copy(full_file_name, dest_dir)
@@ -258,8 +262,8 @@ def set_up_met(met_filepath = "inputs/met/test-APCEMM-met.nc"):
 
 def eval_APCEMM(met_filepath = "inputs/met/test-APCEMM-met.nc",
                 output_filepath = "outputs/APCEMM-test-outputs.csv"):
-    # Default the variables
-    default_APCEMM_vars()
+    # # Default the variables
+    # default_APCEMM_vars()
 
     # Eliminate the output files
     reset_APCEMM_outputs()
