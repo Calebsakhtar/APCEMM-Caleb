@@ -139,17 +139,12 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
         "Extinction defined depth, m": depth_m,
     }
 
+    op_filedir = os.path.dirname(op_filepath)
+    if not os.path.exists(op_filedir):
+        os.makedirs(op_filedir)
+
     DF = pd.DataFrame.from_dict(data)
     DF.to_csv(op_filepath)
-
-    # if len(t_hrs) == 0:
-    #     t_hrs.append(0)
-
-    # while len(t_hrs) < 37:
-    #     t_hrs.append(t_hrs[-1] + 10. / 60.)
-
-    # while len(output) < 37:
-    #     output.append(0)
 
     return data
 
