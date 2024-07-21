@@ -157,6 +157,10 @@ def reset_APCEMM_outputs():
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     directory = os.path.join(directory, "APCEMM_out/")
 
+    # See https://stackoverflow.com/a/273227
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     for file in sorted(os.listdir(directory)):
         if(file.startswith('ts_aerosol') and file.endswith('.nc')):
             file_path = os.path.join(directory,file)
