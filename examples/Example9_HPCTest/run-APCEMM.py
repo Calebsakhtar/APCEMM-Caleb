@@ -139,7 +139,7 @@ def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
         "Extinction defined depth, m": depth_m,
     }
 
-    op_filedir = os.path.dirname(op_filepath)
+    op_filedir = os.path.dirname(op_filepath) # https://stackoverflow.com/a/10149358
     if not os.path.exists(op_filedir):
         os.makedirs(op_filedir)
 
