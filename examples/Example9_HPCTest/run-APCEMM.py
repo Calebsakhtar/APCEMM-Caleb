@@ -59,6 +59,35 @@ def write_shear(shear = 2e-3):
 READING APCEMM OUTPUTS FUNCTIONS
 **********************************
 """
+def initialise_output_directory():
+    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    op_directory = os.path.join(directory, "outputs/")
+
+    # Delete the contents of the outputs directory. See https://stackoverflow.com/a/185941
+    for file in sorted(os.listdir(op_directory)):
+        file_path = os.path.join(op_directory,file)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+def save_APCEMM_raw_outputs(case_name):
+    directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    orig_dir = os.path.join(directory, "APCEMM_out/")
+    dest_dir = os.path.join(directory, "outputs/raw/" + case_name + "/")
+
+    # See https://stackoverflow.com/a/273227
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    # See https://stackoverflow.com/a/3399299
+    for file_name in orig_dir:
+        full_file_name = os.path.join(orig_dir, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, dest_dir)
 
 def process_and_save_outputs(filepath = "outputs/APCEMM-test-outputs.csv"):
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -156,16 +185,16 @@ def reset_APCEMM_outputs():
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+    # See See https://stackoverflow.com/a/185941
     for file in sorted(os.listdir(directory)):
-        if(file.startswith('ts_aerosol') and file.endswith('.nc')):
-            file_path = os.path.join(directory,file)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print('Failed to delete %s. Reason: %s' % (file_path, e))
+        file_path = os.path.join(directory,file)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 def removeLow(arr, cutoff = 1e-3):
     func = lambda x: (x > cutoff) * x
@@ -243,22 +272,25 @@ def eval_APCEMM(met_filepath = "inputs/met/test-APCEMM-met.nc",
 
     return process_and_save_outputs(filepath=output_filepath)
 
-def run_from_met(mode = "sweep"):
+def run_from_met(mode = "sweep", initialise_opdir = True):
     """ Mode can be "sweep", "matrix", or "both" """
 
     if mode == "both":
-        run_from_met(mode = "sweep")
-        run_from_met(mode = "matrix")
+        run_from_met(mode = "sweep", initialise_opdir = False)
+        run_from_met(mode = "matrix", initialise_opdir = False)
         return 1
 
     if (mode != "sweep") & (mode != "matrix"):
         raise ValueError("Invalid input mode in run_from_met()")
-    
+
+    if initialise_opdir:
+        initialise_output_directory()
+
     directory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    op_directory = os.path.join(directory, "outputs/" + mode + "/")
     met_directory_iter = os.path.join(directory, "inputs/met/" + mode + "/")
     met_directory_iter = os.fsencode(met_directory_iter)
-    op_directory = "outputs/" + mode + "/"
-        
+
     i = 1
     for file in os.listdir(met_directory_iter):
         met_filename = os.fsdecode(file)
@@ -271,6 +303,8 @@ def run_from_met(mode = "sweep"):
             met_filepath = met_filepath,
             output_filepath = op_filepath
         )
+
+        save_APCEMM_raw_outputs(case_name)
 
         print(str(i) + " " + mode + " run(s) done")
         i += 1
