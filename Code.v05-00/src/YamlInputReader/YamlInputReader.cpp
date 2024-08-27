@@ -1,7 +1,8 @@
+#include <iostream>
+#include "APCEMM.h"
+#include "Util/MC_Rand.hpp"
 #include "YamlInputReader/YamlInputReader.hpp"
 
-using std::cout;
-using std::endl;
 namespace YamlInputReader{
     void readYamlInputFile(OptInput& input, string filename){
         INPUT_FILE_PATH = std::filesystem::path(filename);
@@ -81,13 +82,22 @@ namespace YamlInputReader{
             throw std::invalid_argument("OpenMP Num Threads (under SIMULATION MENU) cannot be less than 1!");
         }
 
+        #ifdef DEBUG
+            // In DEBUG, force single threaded code to avoid non-reproducibility due to multithreading
+            std::cout << "Compiled in DEBUG mode: setting OMP_NUM_THREADS = 1 to force single threading" << std::endl;
+            input.SIMULATION_OMP_NUM_THREADS = 1;
+        #endif
+
         YAML::Node paramSweepSubmenu = simNode["PARAM SWEEP SUBMENU"];
         input.SIMULATION_PARAMETER_SWEEP = parseBoolString(paramSweepSubmenu["Parameter sweep (T/F)"].as<string>(), "Parameter sweep (T/F");
         input.SIMULATION_MONTECARLO = parseBoolString(paramSweepSubmenu["Run Monte Carlo (T/F)"].as<string>(), "Run Monte Carlo (T/F)");
         input.SIMULATION_MCRUNS =  parseIntString(paramSweepSubmenu["Num Monte Carlo runs (int)"].as<string>(), "Num Monte Carlo runs (int)");
 
         YAML::Node outputSubmenu = simNode["OUTPUT SUBMENU"];
-        input.SIMULATION_OUTPUT_FOLDER = parseFileSystemPath(outputSubmenu["Output folder (string)"].as<string>());
+        std::string outputFolder =  parseFileSystemPath(outputSubmenu["Output folder (string)"].as<string>());
+        // Ensure path to save directory is terminated by "/"
+        if ( outputFolder.back() != '/' ) {outputFolder = outputFolder + "/";}
+        input.SIMULATION_OUTPUT_FOLDER = outputFolder;
         input.SIMULATION_OVERWRITE = parseBoolString(outputSubmenu["Overwrite if folder exists (T/F)"].as<string>(), "Overwrite if folder exists (T/F)");
         input.SIMULATION_THREADED_FFT = parseBoolString(simNode["Use threaded FFT (T/F)"].as<string>(), "Use threaded FFT (T/F)");
 
@@ -307,7 +317,7 @@ namespace YamlInputReader{
         }
     }
 
-    vector<std::unordered_map<string, double>> generateCasesHelper(vector<std::unordered_map<string, double>>& allCases, const vector<std::pair<string, Vector_1D>>& params, const int row){
+    vector<std::unordered_map<string, double>> generateCasesHelper(vector<std::unordered_map<string, double>>& allCases, const vector<std::pair<string, Vector_1D>>& params, const std::size_t row){
         if(row ==  params.size()){
             return allCases;
         }
@@ -354,7 +364,6 @@ namespace YamlInputReader{
             if(colon_split_tokens.size() != 0 && colon_split_tokens.size() != 2){
                 throw std::invalid_argument("Monte Carlo Simulation requires parameter input format of min:max or a singular (constant) value at " + paramLocation + "!");
             }
-            setSeed();
             Vector_1D paramVector;
             const double min = parseDoubleString(colon_split_tokens[0], "");
             const double max = parseDoubleString(colon_split_tokens[1], "");

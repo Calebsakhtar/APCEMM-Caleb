@@ -1,9 +1,12 @@
+#include <numeric>
+#include "Util/PhysConstant.hpp"
 #include "LAGRID/RemappingFunctions.hpp"
+
 namespace LAGRID {
 
-    void twoDGridVariable::addBuffer(double bufLen_left, double bufLen_right, double bufLen_top, double bufLen_bot) {
+    void twoDGridVariable::addBuffer(double bufLen_left, double bufLen_right, double bufLen_top, double bufLen_bot, double fillValue) {
         int nx_before = xCoords.size();
-        int ny_before = yCoords.size();
+        // int ny_before = yCoords.size();
 
         //Generate coords of buffer areas
         int numRows_topBuffer = std::floor(bufLen_top / dy);
@@ -30,14 +33,14 @@ namespace LAGRID {
 
         //Expand phi 2d array
         for(int j = 0; j < numRows_topBuffer + numRows_botBuffer; j++) {
-            phi.push_back(Vector_1D(nx_before, 0));
+            phi.push_back(Vector_1D(nx_before, fillValue));
         }
 
         //rotate right by numRows_botBuffer to get those on the other side.
         std::rotate(phi.rbegin(), phi.rbegin() + numRows_botBuffer, phi.rend());
-        for(int j = 0; j < yCoords.size(); j++) {
-            phi[j].insert(phi[j].begin(), numCols_leftBuffer, 0);
-            phi[j].insert(phi[j].end(), numCols_rightBuffer, 0);
+        for(std::size_t j = 0; j < yCoords.size(); j++) {
+            phi[j].insert(phi[j].begin(), numCols_leftBuffer, fillValue);
+            phi[j].insert(phi[j].end(), numCols_rightBuffer, fillValue);
         }
 
     }
@@ -89,7 +92,7 @@ namespace LAGRID {
             const MassBox& b = boxGrid.boxes[box_idx];
             int startGridIdx_x = std::floor((b.topLeftX - remapping.x0) / remapping.dx);
             int endGridIdx_x = std::floor((b.botRightX - remapping.x0) / remapping.dx);
-            int startGridIdx_y = std::floor((b.topLeftY - remapping.y0) / remapping.dy);
+            // int startGridIdx_y = std::floor((b.topLeftY - remapping.y0) / remapping.dy);
             int endGridIdx_y = std::floor((b.botRightY - remapping.y0) / remapping.dy);
 
             for (int j = endGridIdx_y; j <= endGridIdx_y; j++) {
@@ -123,12 +126,25 @@ namespace LAGRID {
         Vector_2D phi_new(ny, Vector_1D(nx));
         Vector_1D dx_new(ny);
         Vector_1D x0_new(ny);
+        /*
         for(int j = 0; j < ny; j++) {
             dx_new[j] = dx_old * dy_new[j] / dy_old;
             x0_new[j] = x0_old + nx * (dx_old - dx_new[j]) / 2;
             double cellAreaRatio = dy_new[j] * dy_new[j] / (dy_old * dy_old);
             for(int i = 0; i < nx; i++) {
                 phi_new[j][i] = phi_old[j][i] / cellAreaRatio;
+            }
+        }
+        */
+        // SDE 2024-08-12: Kludge - above is causing significant and cumulative noise
+        // due to errors propagating from the met_.Update() calculation, even when
+        // pressure velocity is zero
+        for(int j = 0; j < ny; j++) {
+            dx_new[j] = dx_old;
+            x0_new[j] = x0_old;
+            // double cellAreaRatio = dy_new[j] * dy_new[j] / (dy_old * dy_old);
+            for(int i = 0; i < nx; i++) {
+                phi_new[j][i] = phi_old[j][i];
             }
         }
         return FreeCoordBoxGrid(dx_new, dy_new, phi_new, x0_new, y0_new, mask);
@@ -159,6 +175,43 @@ namespace LAGRID {
             }
         }
         return twoDGridVariable(std::move(phi), std::move(xCoords), std::move(yCoords));
+    }
+
+    // Just return the unused fraction
+    // One day we will replace all this with linear algebra. It will be glorious
+    twoDGridVariable getUnusedFraction(const FreeCoordBoxGrid& boxGrid, const Remapping& remapping) {
+        Vector_1D xCoords(remapping.nx);
+        Vector_1D yCoords(remapping.ny);
+
+        //Using some type-deduced local variables i, j that are default const (added with C++14 generic lambdas), so need the mutable to be able to modify them in the lambda.
+        std::generate(xCoords.begin(), xCoords.end(), [&remapping, i = 0] () mutable { return remapping.x0 + remapping.dx * ( (i++) + 0.5);});
+        std::generate(yCoords.begin(), yCoords.end(), [&remapping, j = 0] () mutable { return remapping.y0 + remapping.dy * ( (j++) + 0.5);});
+        double cellArea = remapping.dx * remapping.dy;
+
+        // How much of each grid cell has not been written to?
+        Vector_2D frac_unused(remapping.ny, Vector_1D(remapping.nx));
+        for (int j = 0; j < remapping.ny; j++) {
+            for (int i = 0; i < remapping.nx; i++) {
+                frac_unused[j][i] = 1.0;
+            }
+        }
+
+        for(auto& b: boxGrid.boxes) {
+            //Need the std::min bounding to deal with edge cases of some boundary cell being included in the remapping.
+            int startGridIdx_x = std::max(std::floor((b.topLeftX - remapping.x0) / remapping.dx), 0.0);
+            int endGridIdx_x = std::min(std::floor((b.botRightX - remapping.x0) / remapping.dx), static_cast<double>(frac_unused[0].size() - 1));
+            int startGridIdx_y = std::max(std::floor((b.botRightY - remapping.y0) / remapping.dy), 0.0);
+            int endGridIdx_y = std::min(std::floor((b.topLeftY - remapping.y0) / remapping.dy), static_cast<double>(frac_unused.size() - 1));
+
+            for (int j = startGridIdx_y; j <= endGridIdx_y; j++) {
+                for(int i = startGridIdx_x; i <= endGridIdx_x; i++) {
+                    double area = coveredArea(remapping, b, i, j);
+                    frac_unused[j][i] -= area / cellArea;
+                }
+            }
+        }
+
+        return twoDGridVariable(std::move(frac_unused), std::move(xCoords), std::move(yCoords));
     }
 
     Vector_2D initVarToGrid( double mass, const Vector_1D& xEdges, const Vector_1D& yEdges,

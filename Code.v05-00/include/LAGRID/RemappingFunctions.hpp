@@ -1,9 +1,7 @@
 #ifndef LAGRID_REMAPPINGFUNCTIONS_H
 #define LAGRID_REMAPPINGFUNCTIONS_H
+
 #include "LAGRID/FreeCoordBoxGrid.hpp"
-#include "Util/PhysConstant.hpp"
-#include "Util/VectorUtils.hpp"
-#include <numeric>
 #include <algorithm>
 #include <type_traits>
 #include <functional>
@@ -53,7 +51,7 @@ namespace LAGRID {
         Vector_1D yCoords;
         double dx;
         double dy;
-        void addBuffer(double bufLen_left, double bufLen_right, double bufLen_top, double bufLen_bot);
+        void addBuffer(double bufLen_left, double bufLen_right, double bufLen_top, double bufLen_bot, double fillValue);
     };
 
     inline double coveredArea(const Remapping& remapping, const MassBox& b, int i, int j) {
@@ -77,6 +75,7 @@ namespace LAGRID {
     double diffusionLossFunctionExact(const FreeCoordBoxGrid& boxGrid, const Remapping& remapping);
     double diffusionLossFunctionBoundaryEstimate(const FreeCoordBoxGrid& boxGrid, const Remapping& remapping);
     twoDGridVariable mapToStructuredGrid(const FreeCoordBoxGrid& boxGrid, const Remapping& remapping);
+    twoDGridVariable getUnusedFraction(const FreeCoordBoxGrid& boxGrid, const Remapping& remapping);
 
     Vector_2D initVarToGrid(double mass, const Vector_1D& xEdges, const Vector_1D& yEdges,
                             std::function<double(double, double)> weightFunction, double logBinRatio = 1 );

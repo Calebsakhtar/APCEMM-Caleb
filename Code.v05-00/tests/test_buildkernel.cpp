@@ -1,11 +1,9 @@
 #include "AIM/buildKernel.hpp"
 #include "Util/ForwardDecl.hpp"
-#include "Util/PhysFunction.hpp"
 #include "Util/PhysConstant.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
-#include <iostream>
 
 using namespace AIM;
 
@@ -47,7 +45,7 @@ TEST_CASE("Build kernel", "[single-file]") {
         bin_centers2[0] = 0.5*0.002e-6;
         double rho_1 =  1.0e3;
         double rho_2 = 1.0e3;
-        double bin_R = 0.5*0.002e-6;
+        // double bin_R = 0.5*0.002e-6;
 
         Vector_2D kernel = buildBrownianKernel(T, p, bin_centers1, rho_1, bin_centers2, rho_2);
 

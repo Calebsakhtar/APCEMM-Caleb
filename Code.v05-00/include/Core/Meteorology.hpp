@@ -14,24 +14,16 @@
 #ifndef METEOROLOGY_H_INCLUDED
 #define METEOROLOGY_H_INCLUDED
 
-#include <iostream>
-#include <memory>
 #include "APCEMM.h"
 #ifdef OMP
     #include "omp.h"
 #endif /* OMP */
 
-/* Include Parameters.hpp for multithreading option */
-#include "Core/Parameters.hpp"
 #include "Util/ForwardDecl.hpp"
-#include "Core/Mesh.hpp"
 #include "Core/Input_Mod.hpp"
-#include "Util/PhysConstant.hpp"
 #include "Util/MetFunction.hpp"
-/*#include <netcdfcpp.h>*/
+#include "Util/PhysFunction.hpp"
 #include <netcdf>
-#include <limits>
-#include <algorithm>
 
 using namespace netCDF;
 using namespace netCDF::exceptions;
@@ -86,7 +78,7 @@ class Meteorology
         inline double rhwAtAlt(double alt) const {
             Vector_1D rhwVec(yCoords_.size());
             Vector_1D h2o1D = H2O_1D();
-            for(int j = 0; j < yCoords_.size(); j++) {
+            for(std::size_t j = 0; j < yCoords_.size(); j++) {
                 rhwVec[j] = physFunc::H2OToRHw(h2o1D[j], tempBase_[j]);
             }
             return met::linInterpMetData(altitude_, rhwVec, alt);
@@ -105,7 +97,7 @@ class Meteorology
         inline const Vector_1D& tempBase() const { return tempBase_; }
         inline const Vector_1D H2O_1D() const {
             Vector_1D h2o1D(yCoords_.size());
-            for(int j = 0; j < yCoords_.size(); j++) {
+            for(std::size_t j = 0; j < yCoords_.size(); j++) {
                 h2o1D[j] = H2O_[j][0];
             }
             return h2o1D;

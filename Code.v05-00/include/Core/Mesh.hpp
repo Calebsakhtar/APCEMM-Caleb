@@ -14,16 +14,8 @@
 #ifndef MESH_H_INCLUDED
 #define MESH_H_INCLUDED
 
-#include <iostream>
-#include <iomanip>
-#include <vector>
-
 #include "Util/ForwardDecl.hpp"
-#include "Core/Parameters.hpp"
-#include "Core/Interface.hpp"
 #include "Core/Cluster.hpp"
-#include "Core/Ring.hpp"
-#include "Util/PhysConstant.hpp"
 #include "Core/Input_Mod.hpp"
 
 enum class MeshDomainLimitsSpec : unsigned char{
@@ -60,8 +52,9 @@ class Mesh
         void initCoordVectors(MeshDomainLimitsSpec limitsSpec);
 
         inline void calcAreas() {
-            for ( int j = 0; j < ny; j++ ) {
-                for ( int i = 0; i < nx; i++ ) {
+            // UInt to be consistent with mesh size definition
+            for ( UInt j = 0; j < ny; j++ ) {
+                for ( UInt i = 0; i < nx; i++ ) {
                     areas_[j][i] = dx_[i] * dy_[j];
                 }
             }

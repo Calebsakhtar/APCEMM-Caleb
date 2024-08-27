@@ -1,7 +1,7 @@
 #ifndef LAGRIDPLUMEMODEL_H
 #define LAGRIDPLUMEMODEL_H
+
 #include "AIM/Aerosol.hpp"
-#include "AIM/Settling.hpp"
 #include "LAGRID/RemappingFunctions.hpp"
 #include "FVM_ANDS/FVM_Solver.hpp"
 #include "EPM/Integrate.hpp"
@@ -9,10 +9,10 @@
 #include "Core/MPMSimVarsWrapper.hpp"
 #include "Core/TimestepVarsWrapper.hpp"
 #include "Core/Meteorology.hpp"
-#include "Util/VectorUtils.hpp"
-#include "Util/PlumeModelUtils.hpp"
-#include <filesystem>
+#include "Core/SZA.hpp"
 #include "Core/Status.hpp"
+#include "Util/VectorUtils.hpp"
+
 class LAGRIDPlumeModel {
     public:
         static constexpr bool COCIP_MIXING = 0; // Results in less accurate mixing representation, only meant for comparisions vs. the CoCiP model.
@@ -53,6 +53,7 @@ class LAGRIDPlumeModel {
         Vector_1D xCoords_;
         Vector_1D xEdges_;
         Vector_2D H2O_;
+        Vector_2D Contrail_;
         Vector_1D vFall_;
         double initNumParts_;
         double simTime_h_;
@@ -69,18 +70,44 @@ class LAGRIDPlumeModel {
             return VectorUtils::Vec2DMask(iceTotalNum, xEdges_, yEdges_, iceNumMaskFunc);
         }
 
+        inline MaskType H2OMask() {
+            Vector_2D metH2O = met_.H2O_field();
+            Vector_2D diffH2O = Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size()));
+            for (std::size_t j = 0; j < yCoords_.size(); j++) {
+                for (std::size_t i = 0; i < xCoords_.size(); i++) {
+                    diffH2O[j][i] = std::abs(H2O_[j][i] - metH2O[j][i]);
+                }
+            }
+            double maxDiff = 1.0e6;
+            auto maskFunc = [maxDiff](double val) {
+                return val > maxDiff;
+            };
+            return VectorUtils::Vec2DMask(diffH2O, xEdges_, yEdges_, maskFunc);
+        }
+
+        inline MaskType ContrailMask(double minVal=1.0e-2) {
+            auto maskFunc = [minVal](double val) {
+                return val > minVal;
+            };
+            return VectorUtils::Vec2DMask(Contrail_, xEdges_, yEdges_, maskFunc);
+        }
+
         void createOutputDirectories();
         void initializeGrid();
         void saveTSAerosol();
         void initH2O();
         void updateDiffVecs();
         void runTransport(double timestep);
-        void remapAllVars(double remapTimestep);
+        void remapAllVars(double remapTimestep, const std::vector<std::vector<int>>& mask, const VectorUtils::MaskInfo& maskInfo);
         void trimH2OBoundary();
-        LAGRID::twoDGridVariable remapVariable(const VectorUtils::MaskInfo& maskInfo, const BufferInfo& buffers, const Vector_2D& phi, const std::vector<std::vector<int>>& mask);
+        std::pair<LAGRID::twoDGridVariable,LAGRID::twoDGridVariable> remapVariable(const VectorUtils::MaskInfo& maskInfo, const BufferInfo& buffers, const Vector_2D& phi, const std::vector<std::vector<int>>& mask);
         double totalAirMass();
         void runCocipH2OMixing(const Vector_2D& h2o_old, const Vector_2D& h2o_amb_new, MaskType& mask_old, MaskType& mask_new);
 
+        Eigen::SparseMatrix<double> createRegriddingWeightsSparse(const VectorUtils::MaskInfo& maskInfo, const BufferInfo& buffers, const std::vector<std::vector<int>>& mask, Vector_1D& xEdgesNew, Vector_1D& yEdgesNew, Vector_1D& xCoordsNew, Vector_1D& yCoordsNew);
+        Vector_2D applyWeights(const Eigen::SparseMatrix<double>& weights, int nx_old, int ny_old, int nx_new, int ny_new, const Vector_2D& dataIn); 
+
+        void printVector2D(const std::string fieldName, const Vector_2D& dataIn);
 
 };
 

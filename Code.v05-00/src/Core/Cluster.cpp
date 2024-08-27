@@ -11,6 +11,8 @@
 /*                                                                  */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#include <iostream>
+#include <iomanip>
 #include "Core/Cluster.hpp"
 
 Cluster::Cluster( )
@@ -144,7 +146,6 @@ Cluster::~Cluster( )
 void Cluster::ComputeRingAreas( const Vector_2D &cellAreas, const Vector_3D &weights ) 
 {
 
-    double currRingArea;
     UInt iNx, jNy, iRing;
 
     UInt size = 0;

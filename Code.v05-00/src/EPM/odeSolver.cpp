@@ -11,6 +11,11 @@
 /*                                                                  */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#include <fstream>
+#include <iostream>
+#include "Core/Parameters.hpp"
+#include "Util/PhysConstant.hpp"
+#include "Util/PhysFunction.hpp"
 #include "EPM/odeSolver.hpp"
 
 namespace EPM
@@ -354,7 +359,7 @@ namespace EPM
     {
 
         /* Variable definitions */
-        int counter = 0;
+        std::size_t counter = 0;
         float RHw;
         bool watersup { false };
 

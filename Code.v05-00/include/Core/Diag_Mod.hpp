@@ -14,20 +14,13 @@
 #ifndef DIAG_MOD_H_INCLUDED
 #define DIAG_MOD_H_INCLUDED
 
-#include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
-
-#include "Core/Interface.hpp"
+#include <netcdf>
 #include "Core/Structure.hpp"
 #include "Core/Mesh.hpp"
 #include "Core/Meteorology.hpp"
-#include "Core/Util.hpp"
 #include "KPP/KPP_Global.h"
-#include "Util/VectorUtils.hpp"
-#include <netcdf>
-#include <filesystem>
 
 namespace Diag {
     using namespace netCDF;
@@ -72,10 +65,12 @@ namespace Diag {
     * NY x NX x NFAM 
     * into netCDF files at a frequency specified by the input file */
 
-    //bool Diag_PL( const char* ROOTNAME,                     \
-    //              const int hh, const int mm, const int ss, \
-    //              const Solution& Data,                     \
-    //              const Mesh& m );
+    /*
+    bool Diag_PL( const char* ROOTNAME,                     \
+                 const int hh, const int mm, const int ss, \
+                 const Solution& Data,                     \
+                 const Mesh& m );
+    */
 
     #endif /* DIAG_MOD_H_INCLUDED */
 

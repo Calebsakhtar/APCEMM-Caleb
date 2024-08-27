@@ -11,6 +11,9 @@
 /*                                                                  */
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#include <algorithm>
+#include <iomanip>
+#include "Util/ForwardDecl.hpp"
 #include "Core/ReadJRates.hpp"
 
 void ReadJRates( const char* ROOTDIR,                          \
@@ -21,7 +24,7 @@ void ReadJRates( const char* ROOTDIR,                          \
 {
 
     /* Set up for error messages */
-    static const int NC_ERR = 2;
+    // static const int NC_ERR = 2;
 
     std::string fullPath;
     std::stringstream mm, dd;
@@ -69,6 +72,12 @@ void ReadJRates( const char* ROOTDIR,                          \
     const unsigned int LON_INDEX = std::distance( lon.begin(), LON_IT );
     bool LON_EDGE = 0;
     double LON_LOW, LON_HIGH;
+
+    /*
+    Initialize LON_LOW to help compiler understand it's never uninitialized when used
+    This value will be overwritten before LON_LOW is called
+    */
+    LON_LOW = 0; 
 
     if ( ( LON_INDEX == 0 ) || ( LON_INDEX + 1 == LON_SIZE ) )
         LON_EDGE = 1;

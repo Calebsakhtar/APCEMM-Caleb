@@ -6,12 +6,19 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/submodules/vcpkg/scripts/b
 project(APCEMM)
 
 # Options
-SET(DEBUG 0)
+option(DEBUG "Enable debug mode" OFF)
 SET(RINGS 0)
 SET(OMP 1)
 option(BUILD_TEST ON)
 
-if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")	
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")	
+    include(CheckCXXCompilerFlag)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gdwarf-2 -gstrict-dwarf -O0 -Wall -Wextra -Wconversion")
+    #add_compile_options(-fno-omit-frame-pointer -fsanitize=bounds -fsanitize=address -fsanitize=undefined)
+    #add_link_options(-fsanitize=bounds -fsanitize=address -fsanitize=undefined)
+    add_compile_options(-fno-omit-frame-pointer -fsanitize=bounds -fsanitize=undefined)
+    add_link_options(-fsanitize=bounds -fsanitize=undefined)
+elseif (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
     include(CheckCXXCompilerFlag)
     CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
@@ -19,6 +26,10 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     endif()
     
+    # Turn on warnings always
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
+
+
     #Enabling unsafe optimizations doesn't seem to affect the runtime much, but could be something to check just in case later.
     #-Michael
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -fno-trapping-math -funsafe-math-optimizations")
@@ -48,6 +59,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithM
 find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
 
+find_package(fmt CONFIG REQUIRED)
+# target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
+
 find_package(FFTW3 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE FFTW3::fftw3)
 
@@ -64,12 +79,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 
 
 # This ensures the header files of the necessary libraries are included
-include_directories(${Boost_INCLUDES})
-include_directories(${OpenMP_INCLUDES})
-include_directories(${FFTW_INCLUDES})
-include_directories(${NETCDF_INCLUDES})
-include_directories(${netCDFCxx_INCLUDE_DIRS})
-include_directories(${YAML_CPP_INCLUDE_DIR})
+# SYSTEM flag silences the compiler warnings from external dependencies 
+include_directories(SYSTEM ${Boost_INCLUDES})
+include_directories(SYSTEM ${OpenMP_INCLUDES})
+include_directories(SYSTEM ${FFTW_INCLUDES})
+include_directories(SYSTEM ${NETCDF_INCLUDES})
+include_directories(SYSTEM ${netCDFCxx_INCLUDE_DIRS})
+include_directories(SYSTEM ${YAML_CPP_INCLUDE_DIR})
 
 # Ensure header files of APCEMM are included
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -88,3 +104,6 @@ enable_testing()
 add_subdirectory(tests)
 #endif()
 
+if (DEBUG)
+  message(STATUS "DEBUG mode is enabled")
+endif()

@@ -3,11 +3,9 @@
 #include <Util/PhysFunction.hpp>
 #include <Util/PhysConstant.hpp>
 #include <Util/MetFunction.hpp>
-#include <iostream>
 
 using namespace met;
-using std::cout;
-using std::endl;
+
 TEST_CASE( "MetFunction", "[single-file]" ) {
 	SECTION("Compute Lapse Rate"){
 		//no idea where this equation comes from.
@@ -104,7 +102,7 @@ TEST_CASE( "MetFunction", "[single-file]" ) {
 		try{
 			satdepth_calc(RHw3, T, alt, 6, 1500);
 		}
-		catch(std::out_of_range e){
+		catch(std::out_of_range &e){
 			std::string error = e.what();
 			REQUIRE(error == "In met::satdepth_calc: No end of ice supersaturated layer found.");
 		}

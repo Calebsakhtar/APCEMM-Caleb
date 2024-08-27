@@ -14,31 +14,15 @@
 #ifndef STRUCTURE_H_INCLUDED
 #define STRUCTURE_H_INCLUDED
 
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <fstream>
-#include <sstream>
 #include <cmath> 
-
-#include "Core/Interface.hpp"
-#include "Core/Parameters.hpp"
+#include "AIM/Aerosol.hpp"
+#include "KPP/KPP_Global.h"
 #include "Util/ForwardDecl.hpp"
 #include "Core/Input.hpp"
 #include "Core/Input_Mod.hpp"
-#include "KPP/KPP_Parameters.h"
-#include "KPP/KPP_Global.h"
-#include "KPP/KPP.hpp"
-#include "Util/PhysConstant.hpp"
-#include "Util/PhysFunction.hpp"
 #include "Core/Emission.hpp"
 #include "Core/Aircraft.hpp"
-#include "Core/Engine.hpp"
-#include "Core/LiquidAer.hpp"
-#include "Core/SZA.hpp"
 #include "Core/Input_Mod.hpp"
-#include "AIM/Aerosol.hpp"
 #include "Core/Meteorology.hpp"
 
 class Solution
@@ -80,7 +64,7 @@ class Solution
                       const UInt j = 0, \
 		      const bool CHEMISTRY = 0 );
 
-        int SpinUp( Vector_1D &amb_Value,       \
+        void SpinUp( Vector_1D &amb_Value,       \
                     const Input &input,         \
                     const double airDens,   \
                     const double startTime, \

@@ -1,7 +1,8 @@
 #include "LAGRID/RemappingFunctions.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
-#include <iostream>
+#include <numeric>
+
 TEST_CASE("FreeCoordBoxGrid and Remapping") {
     Vector_1D dy = {1, 2, 3, 4};
     Vector_1D dx = {1, 2, 3, 4};
@@ -72,8 +73,8 @@ TEST_CASE("FreeCoordBoxGrid and Remapping") {
         REQUIRE(twoDGrid.xCoords[10] == 20);
 
         double mass_after = 0;
-        for (int j = 0; j < twoDGrid.phi.size(); j++){
-            for (int i = 0; i < twoDGrid.phi[0].size(); i++) {
+        for (std::size_t j = 0; j < twoDGrid.phi.size(); j++){
+            for (std::size_t i = 0; i < twoDGrid.phi[0].size(); i++) {
                 mass_after += twoDGrid.phi[j][i] * twoDGrid.dx * twoDGrid.dy;
             }
         }
@@ -84,7 +85,7 @@ TEST_CASE("FreeCoordBoxGrid and Remapping") {
     }
 
     SECTION("Adding Buffer") {
-        twoDGrid.addBuffer(6, 10, 4, 8);
+        twoDGrid.addBuffer(6, 10, 4, 8, 0.0);
         REQUIRE(twoDGrid.yCoords.size() == 12);
         REQUIRE(twoDGrid.xCoords.size() == 19);
         REQUIRE(twoDGrid.xCoords[0] == -6);
@@ -101,8 +102,8 @@ TEST_CASE("FreeCoordBoxGrid and Remapping") {
         REQUIRE(twoDGrid.phi.size() == 12);
         REQUIRE(twoDGrid.phi[0].size() == 19);
         double mass = 0;
-        for (int j = 0; j < twoDGrid.phi.size(); j++){
-            for (int i = 0; i < twoDGrid.phi[0].size(); i++) {
+        for (std::size_t j = 0; j < twoDGrid.phi.size(); j++){
+            for (std::size_t i = 0; i < twoDGrid.phi[0].size(); i++) {
                 mass += twoDGrid.phi[j][i] * twoDGrid.dx * twoDGrid.dy;
             }
         }
