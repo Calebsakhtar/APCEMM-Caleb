@@ -2,7 +2,7 @@ SIMULATION MENU:
   # Only one of parameter sweep or MC simulation can be on.
   # Parameter sweep lets you specify an arbitrary number of custom values for each parameter; Monte Carlo simulation is self-explanatory.
   # At the moment, you cannot mix and match MC sim and param sweep on each individual parameter.
-  OpenMP Num Threads (positive int): 1
+  OpenMP Num Threads (positive int): 8
   PARAM SWEEP SUBMENU:
     Parameter sweep (T/F): T
   #-OR---------------
