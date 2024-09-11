@@ -122,7 +122,7 @@ AEROSOL MENU:
   Coag. timestep [min] (double): 60
   # Keep on
   Turn on ice growth (T/F): T
-  Ice growth timestep [min] (double): 10
+  Ice growth timestep [min] (double): 1
 
 # At least one of "Use met. input", "Impose moist layer depth", or "Impose lapse rate" must be true
 # Imposing moist layer depth will automatically calculate the lapse rate and override the imposed lapse rate
