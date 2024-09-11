@@ -261,7 +261,8 @@ def set_up_met(met_filepath = "inputs/met/test-APCEMM-met.nc"):
     shutil.copyfile(source_filepath, destination_filepath)
 
 def eval_APCEMM(met_filepath = "inputs/met/test-APCEMM-met.nc",
-                output_filepath = "outputs/APCEMM-test-outputs.csv"):
+                output_filepath = "outputs/APCEMM-test-outputs.csv",
+                yaml_filename = "input.yaml"):
     # # Default the variables
     # default_APCEMM_vars()
 
@@ -272,11 +273,11 @@ def eval_APCEMM(met_filepath = "inputs/met/test-APCEMM-met.nc",
     set_up_met(met_filepath=met_filepath)
 
     # Run APCEMM
-    os.system('./../../build/APCEMM input.yaml')
+    os.system(f'./../../build/APCEMM {yaml_filename}')
 
     return process_and_save_outputs(filepath=output_filepath)
 
-def run_from_met(mode = "sweep", initialise_opdir = True):
+def run_from_met(mode = "sweep", initialise_opdir = True, yaml_filename = "input.yaml"):
     """ Mode can be "sweep", "matrix", or "both" """
 
     if mode == "both":
@@ -305,7 +306,8 @@ def run_from_met(mode = "sweep", initialise_opdir = True):
 
         eval_APCEMM(
             met_filepath = met_filepath,
-            output_filepath = op_filepath
+            output_filepath = op_filepath,
+            yaml_filename = yaml_filename
         )
 
         save_APCEMM_raw_outputs(case_name)
