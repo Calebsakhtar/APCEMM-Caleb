@@ -7,5 +7,5 @@ if __name__ == "__main__":
     casename = casename.split("-")[0]
 
     os.system(f"cp -r sample_rundir {casename}")
-    os.system(f"cp inputpath {casename}/met.nc")
+    os.system(f"cp {inputpath} {casename}/met.nc")
     os.system(f"cd {casename} && ./../../../build/APCEMM input.yaml")
