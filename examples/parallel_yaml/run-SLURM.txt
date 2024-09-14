@@ -109,4 +109,4 @@ fi
 
 echo -e "\nnumtasks=$numtasks, numnodes=$numnodes, mpi_tasks_per_node=$mpi_tasks_per_node (OMP_NUM_THREADS=$OMP_NUM_THREADS)"
 
-find inputs/*.yaml -print0 | xargs -0 -n1 -P $SLURM_NTASKS srun -n1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_instance.py
+find inputs/*.yaml -print0 | xargs -0 -n1 -P $SLURM_NTASKS srun -n1 --mem=3000MB --exclusive python run_APCEMM_instance.py
