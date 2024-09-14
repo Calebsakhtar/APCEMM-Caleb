@@ -117,7 +117,7 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         // WARNING: H2O approach may not work well with temperature
         // fluctuation field active
         //auto dataMask = H2OMask();
-        auto dataMask = ContrailMask(1.0e-2);
+        auto dataMask = ContrailMask(0.90);
         auto& mask = dataMask.first;
         auto& maskInfo = dataMask.second;
         if (maskInfo.count == 0){
