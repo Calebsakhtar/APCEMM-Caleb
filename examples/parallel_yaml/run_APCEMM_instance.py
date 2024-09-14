@@ -6,6 +6,9 @@ if __name__ == "__main__":
     casename = inputpath.split('/')[-1]
     casename = casename.split(".")[0]
 
+    print(f"Path: {inputpath}\n")
+    print(f"Casename: {casename}\n")
+    
     os.system(f"cp -r sample_rundir/ {casename}")
     os.system(f"cp {inputpath} {casename}/input.yaml")
     os.system(f"cd {casename} && ./../../../build/APCEMM input.yaml")
