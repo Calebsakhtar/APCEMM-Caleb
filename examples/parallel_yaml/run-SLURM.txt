@@ -75,7 +75,7 @@ workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the
 							 
 #! Are you using OpenMP (NB this is unrelated to OpenMPI)? If so increase this
 #! safe value to no more than 56:
-#! export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=1
 
 #! Number of MPI tasks to be started by the application per node and in total (do not change):
 np=$[${numnodes}*${mpi_tasks_per_node}]
@@ -109,8 +109,4 @@ fi
 
 echo -e "\nnumtasks=$numtasks, numnodes=$numnodes, mpi_tasks_per_node=$mpi_tasks_per_node (OMP_NUM_THREADS=$OMP_NUM_THREADS)"
 
-srun -n 1 -c 1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_distance "inputs/01min.yaml" &
-srun -n 1 -c 1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_distance "inputs/03min.yaml" &
-srun -n 1 -c 1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_distance "inputs/05min.yaml" &
-srun -n 1 -c 1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_distance "inputs/08min.yaml" &
-srun -n 1 -c 1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_distance "inputs/10min.yaml" &
+find inputs/*.yaml -print0 | xargs -0 -n1 -P $SLURM_NTASKS srun -n1 --mem_per_cpu=3000MB --exclusive python run_APCEMM_instance.py
