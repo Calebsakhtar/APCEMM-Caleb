@@ -19,7 +19,7 @@
 #! How many (MPI) tasks will there be in total? (<= nodes*56)
 #! The Cascade Lake (cclake) nodes have 56 CPUs (cores) each and
 #! 3420 MiB of memory per CPU.
-#SBATCH --ntasks=5
+#SBATCH --ntasks=10
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=15000MB
 #! How much wallclock time will be required?
