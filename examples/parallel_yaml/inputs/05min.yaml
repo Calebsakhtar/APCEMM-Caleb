@@ -109,7 +109,7 @@ TRANSPORT MENU:
 CHEMISTRY MENU:
   Turn on Chemistry (T/F): F
   Perform hetero. chem. (T/F): F
-  Chemistry Timestep [min] (double): 1
+  Chemistry Timestep [min] (double): 10
   Photolysis rates folder (string): /path/to/input/
 
 AEROSOL MENU:
