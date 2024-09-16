@@ -4,7 +4,7 @@ import os
 if __name__ == "__main__":
     inputpath = sys.argv[1]
     casename = inputpath.split('/')[-1]
-    casename = casename.split("-")[0]
+    casename = casename.split("-met")[0]
 
     os.system(f"cp -r sample_rundir/ {casename}")
     os.system(f"cp {inputpath} {casename}/met.nc")
