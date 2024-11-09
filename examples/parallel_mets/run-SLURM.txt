@@ -27,9 +27,6 @@
 #! What types of email messages do you wish to receive?
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ca525@cam.ac.uk
-#! Uncomment this to prevent the job from being requeued (e.g. if
-#! interrupted by node failure or system downtime):
-##SBATCH --no-requeue
 
 #! sbatch directives end here (put any additional directives above this line)
 
