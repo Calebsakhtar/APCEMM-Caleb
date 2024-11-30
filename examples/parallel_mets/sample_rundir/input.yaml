@@ -86,7 +86,7 @@ PARAMETER MENU:
   # Total fuel flow is then divided per engine
   Total fuel flow [kg/s] (double) : 0.70
   Aircraft mass [kg] (double): 60000.0
-  Flight speed [m/s] (double): 265.42  # NPSS
+  Flight speed [m/s] (double): 240.0  # NPSS
   Num. of engines [2/4] (int): 2
   Wingspan [m] (double): 34.32 # https://www.skybrary.aero/aircraft/b738
   # Values depend on where we assume condensation/freezing to occur and engine type
