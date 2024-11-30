@@ -59,10 +59,10 @@ PARAMETER MENU:
     Brunt-Vaisala Frequency [s^-1] (double): 0.01
   LOCATION AND TIME SUBMENU:
   # Affects for solar zenith angle and photolysis which affect EPM/diurnal variations of temperature
-    LON [deg] (double): -2.084102
-    LAT [deg] (double): 53.979464
+    LON [deg] (double): 0.1202
+    LAT [deg] (double): 52.1983
     Emission day [1-365] (int): 1
-    Emission time [hr] (double) : 0.2805555555555555555555
+    Emission time [hr] (double) : 1
   BACKGROUND MIXING RATIOS SUBMENU:
   # Affects the EPM only
     NOx [ppt] (double): 5100
@@ -84,8 +84,8 @@ PARAMETER MENU:
     Soot [g/kg_fuel] (double): 0.08 # Assuming EI(nvPM) = 10^15
   Soot Radius [m] (double): 20.0E-09
   # Total fuel flow is then divided per engine
-  Total fuel flow [kg/s] (double) : 0.894924
-  Aircraft mass [kg] (double): 63284.6089
+  Total fuel flow [kg/s] (double) : 0.70
+  Aircraft mass [kg] (double): 60000.0
   Flight speed [m/s] (double): 265.42  # NPSS
   Num. of engines [2/4] (int): 2
   Wingspan [m] (double): 34.32 # https://www.skybrary.aero/aircraft/b738
