@@ -84,7 +84,7 @@ PARAMETER MENU:
     # Affects contrail diffusion model:
     SO2 [g/kg_fuel] (double): 1.2 # Assuming 600ppm of Sulfur
     SO2 to SO4 conv [%] (double): 2 # AEDT paper, Barrett et al. (2010)
-    Soot [g/kg_fuel] (double): 0.08 # Assuming EI(nvPM) = 10^15
+    Soot [g/kg_fuel] (double): 0.08 # Assuming EI(nvPM) = 1.19 * 10^15
   Soot Radius [m] (double): 20.0E-09
   # Total fuel flow is then divided per engine
   Total fuel flow [kg/s] (double) : 0.70
