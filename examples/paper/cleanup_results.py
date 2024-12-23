@@ -2,7 +2,7 @@ import sys
 import os
 
 if __name__ == "__main__":
-    date = "12-22"
+    date = "12-24-HPC"
 
     os.system(f"mkdir -p {date}/APCEMM/raw/")
 
