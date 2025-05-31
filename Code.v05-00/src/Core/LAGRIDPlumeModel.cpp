@@ -260,11 +260,14 @@ SimStatus LAGRIDPlumeModel::runEPM() {
     std::cout << "Aircraft flight speed: " << aircraft_.VFlight()<< " [m/s]" << std::endl;
     std::cout << "Fuel EI_H2O: " << EI_.getH2O() << " [g H2O/ kg]" << std::endl;
     std::cout << "Exhaust WV: " << WV_exhaust_ << " [g H2O/ m]" << std::endl;
+    std::cout << "N0: " << N0 << " [#/ m]" << std::endl;
+    std::cout << "gamma: " << gamma << " [m^2/s]" << std::endl;
+    std::cout << "aircraft mass: " << aircraft_.currMass() << " [kg]" << std::endl;
     std::cout << std::endl;
 
     /* Hijacking Parameters */
     WV_exhaust_ = 15.0; // g/m;
-    T_CA = 220.0; // K
+    T_CA = 225.0; // K
     RHi_CA = 110.0; // %
     gamma = 520.0; // m^2/s
     
