@@ -275,25 +275,25 @@ SimStatus LAGRIDPlumeModel::runEPM() {
     /* Hijacking Parameters */
     T_CA = 217.0; // K
     RHi_CA = 120.0; // %
-    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+    double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
     /* Hijacking Parameters */
     T_CA = 217.0; // K
     RHi_CA = 110.0; // %
-    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+    iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
     /* Hijacking Parameters */
     T_CA = 225.0; // K
     RHi_CA = 120.0; // %
-    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+    iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
     /* Hijacking Parameters */
     T_CA = 225.0; // K
     RHi_CA = 110.0; // %
-    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+    iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
     std::cout << "Parameterized vortex sinking survival fraction: " << iceNumFrac << std::endl;
