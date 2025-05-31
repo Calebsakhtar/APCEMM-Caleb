@@ -263,19 +263,36 @@ SimStatus LAGRIDPlumeModel::runEPM() {
     std::cout << "N0: " << N0 << " [#/ m]" << std::endl;
     std::cout << "gamma: " << gamma << " [m^2/s]" << std::endl;
     std::cout << "aircraft mass: " << aircraft_.currMass() << " [kg]" << std::endl;
-    std::cout << std::endl;
-
-    /* Hijacking Parameters */
-    WV_exhaust_ = 15.0; // g/m;
-    T_CA = 225.0; // K
-    RHi_CA = 110.0; // %
-    gamma = 520.0; // m^2/s
+    std::cout << std::endl;    
     
     /* Hijacking Ice Crystal Number*/
     const double N0_hijacked = 3.38E12; // #/m
     epmOutput.IceAer.scalePdf( N0_hijacked / N0 );
     N0 = N0_hijacked;
+    
+    gamma = 520.0; // m^2/s
 
+    /* Hijacking Parameters */
+    T_CA = 217.0; // K
+    RHi_CA = 120.0; // %
+    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+                                                        WV_exhaust_, T_CA, RHi_CA, N0, gamma);
+
+    /* Hijacking Parameters */
+    T_CA = 217.0; // K
+    RHi_CA = 110.0; // %
+    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+                                                        WV_exhaust_, T_CA, RHi_CA, N0, gamma);
+
+    /* Hijacking Parameters */
+    T_CA = 225.0; // K
+    RHi_CA = 120.0; // %
+    const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
+                                                        WV_exhaust_, T_CA, RHi_CA, N0, gamma);
+
+    /* Hijacking Parameters */
+    T_CA = 225.0; // K
+    RHi_CA = 110.0; // %
     const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
