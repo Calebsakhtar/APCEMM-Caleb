@@ -14,7 +14,7 @@ import os
 if __name__ == "__main__":
     inputpath = sys.argv[1]
     casename = inputpath.split("/")[-1]
-    casename = casename.split(".")[0]
+    casename = casename.split(".yaml")[0]
 
     os.system(f"mkdir {casename}")
     os.system(f"cp met/APCEMM-{casename}.nc {casename}/")
