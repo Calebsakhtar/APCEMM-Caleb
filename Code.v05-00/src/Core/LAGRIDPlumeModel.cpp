@@ -270,29 +270,9 @@ SimStatus LAGRIDPlumeModel::runEPM() {
     epmOutput.IceAer.scalePdf( N0_hijacked / N0 );
     N0 = N0_hijacked;
     
-    gamma = 520.0; // m^2/s
-
-    /* Hijacking Parameters */
-    T_CA = 217.0; // K
-    RHi_CA = 120.0; // %
     double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
-    /* Hijacking Parameters */
-    T_CA = 217.0; // K
-    RHi_CA = 110.0; // %
-    iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
-                                                        WV_exhaust_, T_CA, RHi_CA, N0, gamma);
-
-    /* Hijacking Parameters */
-    T_CA = 225.0; // K
-    RHi_CA = 120.0; // %
-    iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
-                                                        WV_exhaust_, T_CA, RHi_CA, N0, gamma);
-
-    /* Hijacking Parameters */
-    T_CA = 225.0; // K
-    RHi_CA = 110.0; // %
     iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
