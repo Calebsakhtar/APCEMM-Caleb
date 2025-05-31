@@ -262,6 +262,17 @@ SimStatus LAGRIDPlumeModel::runEPM() {
     std::cout << "Exhaust WV: " << WV_exhaust_ << " [g H2O/ m]" << std::endl;
     std::cout << std::endl;
 
+    /* Hijacking Parameters */
+    WV_exhaust_ = 15.0; // g/m;
+    T_CA = 220.0; // K
+    RHi_CA = 110.0; // %
+    gamma = 520.0; // m^2/s
+    
+    /* Hijacking Ice Crystal Number*/
+    const double N0_hijacked = 3.38E12; // #/m
+    epmOutput.IceAer.scalePdf( N0_hijacked / N0 );
+    N0 = N0_hijacked;
+
     const double iceNumFrac = aircraft_.VortexLosses( EI_.getSoot(), EI_.getSootRad(), \
                                                         WV_exhaust_, T_CA, RHi_CA, N0, gamma);
 
