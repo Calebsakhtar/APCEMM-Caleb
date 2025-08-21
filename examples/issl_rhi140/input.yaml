@@ -213,4 +213,7 @@ ADVANCED OPTIONS MENU:
     # The values below can be overriden if required.
     Override post-jet ice crystal count (T/F): F
     Post-jet ice crystal count [#/m] (double): 1e15
-
+    Override post-jet ice mass (T/F): F
+    Post-jet ice mass [kg/m] (double): 0.0
+    Use custom plume distribution (T/F): F
+    Custom plume distribution filename (string): ""
