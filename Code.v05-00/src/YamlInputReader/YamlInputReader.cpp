@@ -327,12 +327,12 @@ namespace YamlInputReader{
                 input.ADV_EP_N_POSTJET_OVERRIDE = false;
                 input.ADV_EP_N_POSTJET = 0;
             }
-            if (earlyPlumeSubmenu["Override post-jet ice mass (T/F)"]) {
-                input.ADV_EP_I_POSTJET_OVERRIDE = parseBoolString(earlyPlumeSubmenu["Override post-jet ice mass (T/F)"].as<string>(), "Override post-jet ice mass (T/F)");
-                input.ADV_EP_I_POSTJET = parseDoubleString(earlyPlumeSubmenu["Post-jet ice mass [kg/m] (double)"].as<string>(), "Post-jet ice mass [kg/m] (double)");
+            if (earlyPlumeSubmenu["Override post-vortex ice crystal count (T/F)"]) {
+                input.ADV_EP_N_POSTVORTEX_OVERRIDE = parseBoolString(earlyPlumeSubmenu["Override post-vortex ice crystal count (T/F)"].as<string>(), "Override post-vortex ice crystal count (T/F)");
+                input.ADV_EP_N_POSTVORTEX = parseDoubleString(earlyPlumeSubmenu["Post-vortex ice crystal count [#/m] (double)"].as<string>(), "Post-vortex ice crystal count [#/m] (double)");
             } else {
-                input.ADV_EP_N_POSTJET_OVERRIDE = false;
-                input.ADV_EP_N_POSTJET = 0;
+                input.ADV_EP_N_POSTVORTEX_OVERRIDE = false;
+                input.ADV_EP_N_POSTVORTEX = 0;
             }
             if (earlyPlumeSubmenu["Use custom plume distribution (T/F)"]) {
                 input.ADV_EP_DIST_FROM_FILE = parseBoolString(earlyPlumeSubmenu["Use custom plume distribution (T/F)"].as<string>(), "Use custom plume distribution (T/F)");
@@ -346,8 +346,8 @@ namespace YamlInputReader{
             input.ADV_EP_WINGSPAN_REF = 60.3;
             input.ADV_EP_N_POSTJET_OVERRIDE = false;
             input.ADV_EP_N_POSTJET = 0;
-            input.ADV_EP_I_POSTJET_OVERRIDE = false;
-            input.ADV_EP_I_POSTJET = 0;
+            input.ADV_EP_N_POSTVORTEX_OVERRIDE = false;
+            input.ADV_EP_N_POSTVORTEX = 0;
             input.ADV_EP_DIST_FROM_FILE = false;
             input.ADV_EP_DIST_FILENAME = "";
         }

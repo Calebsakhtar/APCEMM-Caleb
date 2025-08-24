@@ -260,7 +260,15 @@ std::variant<EPM::Output, SimStatus> LAGRIDPlumeModel::runEPM() {
     }
     epmOutput.IceAer.scalePdf(icenum_survfrac);
 
-    std::cout << "Post-vortex ice particle count: " << epmOutput.IceAer.Moment(0) * epmOutput.area * 1e6 << " [#/m]" << std::endl;
+    // Calculate the number of ice particles past the vortex regime
+    double N_postvortex = epmOutput.IceAer.Moment(0) * epmOutput.area * 1e6;
+    if (optInput_.ADV_EP_N_POSTVORTEX_OVERRIDE) {
+        epmOutput.IceAer.scalePdf(optInput_.ADV_EP_N_POSTVORTEX / N_postvortex);
+        N_postvortex = epmOutput.IceAer.Moment(0) * epmOutput.area * 1e6; // recalculate after scaling
+        std::cout << "Overriding post-vortex ice crystal count to: " << N_postvortex;
+        std::cout << " [#/m] (Requested value:" << optInput_.ADV_EP_N_POSTVORTEX << " [#/m])" << std::endl;
+    }
+    std::cout << "Post-vortex ice particle count: " << N_postvortex << " [#/m]" << std::endl;
 
     return epmOutput;
 }
