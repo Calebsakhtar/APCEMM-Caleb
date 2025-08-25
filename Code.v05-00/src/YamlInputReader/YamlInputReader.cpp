@@ -336,7 +336,7 @@ namespace YamlInputReader{
             }
             if (earlyPlumeSubmenu["Use custom plume distribution (T/F)"]) {
                 input.ADV_EP_DIST_FROM_FILE = parseBoolString(earlyPlumeSubmenu["Use custom plume distribution (T/F)"].as<string>(), "Use custom plume distribution (T/F)");
-                input.ADV_EP_DIST_FILENAME = parseString(earlyPlumeSubmenu["Custom plume distribution filename (string)"].as<string>(), "Custom plume distribution filename (string)");
+                input.ADV_EP_DIST_FILENAME = parseFileSystemPath(earlyPlumeSubmenu["Custom plume distribution filename (string)"].as<string>());
             } else {
                 input.ADV_EP_DIST_FROM_FILE = false;
                 input.ADV_EP_DIST_FILENAME = "";
