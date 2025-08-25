@@ -305,11 +305,19 @@ void LAGRIDPlumeModel::initializeGrid(const EPM::Output &epmOut) {
     const double xcenter = 0;
     const double ycenter = -aircraft_.vortex().z_center();
 
-    for (UInt n = 0; n < iceAerosol_.getNBin(); n++) {
-        double EPM_nPart_bin = epmIceAer.binMoment(n) * epmOut.area;
-        double logBinRatio = log(iceAerosol_.getBinEdges()[n+1] / iceAerosol_.getBinEdges()[n]);
-        pdf_init.push_back( LAGRID::initVarToGridRectangular(EPM_nPart_bin, xEdges_, yEdges_, xcenter, ycenter, initWidth, initDepth, logBinRatio) );
-
+    if (optInput_.ADV_EP_DIST_FROM_FILE){
+        for (UInt n = 0; n < iceAerosol_.getNBin(); n++) {
+            double EPM_nPart_bin = epmIceAer.binMoment(n) * epmOut.area;
+            double logBinRatio = log(iceAerosol_.getBinEdges()[n+1] / iceAerosol_.getBinEdges()[n]);
+            pdf_init.push_back( LAGRID::initVarToGridCustom(EPM_nPart_bin, xEdges_, yEdges_, logBinRatio, optInput_.ADV_EP_DIST_FILENAME) );
+        }
+    }
+    else {
+        for (UInt n = 0; n < iceAerosol_.getNBin(); n++) {
+            double EPM_nPart_bin = epmIceAer.binMoment(n) * epmOut.area;
+            double logBinRatio = log(iceAerosol_.getBinEdges()[n+1] / iceAerosol_.getBinEdges()[n]);
+            pdf_init.push_back( LAGRID::initVarToGridRectangular(EPM_nPart_bin, xEdges_, yEdges_, xcenter, ycenter, initWidth, initDepth, logBinRatio) );
+        }
     }
     iceAerosol_.updatePdf(std::move(pdf_init));
     Vector_2D areas = VectorUtils::cellAreas(xEdges_, yEdges_);

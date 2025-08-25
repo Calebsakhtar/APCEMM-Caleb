@@ -1,7 +1,12 @@
 #include <cmath>
 #include <numeric>
+#include <netcdf>
+#include <cassert>
 #include "Util/PhysConstant.hpp"
 #include "LAGRID/RemappingFunctions.hpp"
+
+using namespace netCDF;
+using namespace netCDF::exceptions;
 
 namespace LAGRID {
 
@@ -243,6 +248,56 @@ namespace LAGRID {
             return (x >= xlim_low && x <= xlim_high && y >= ylim_low && y <= ylim_high) ? 1.0 : 0.0;
         };
         return initVarToGrid(mass, xEdges, yEdges, rectFunc, logBinRatio);
+    }
+
+    Vector_2D initVarToGridCustom(double mass, const Vector_1D& xEdges, const Vector_1D& yEdges,
+        double logBinRatio, const std::string filename)
+    {
+        // NOTE: ANY CUSTOM INPUT USED HERE MUST MATCH THE GRID DEFINED IN input.yaml
+
+        std::string varName = "number_concentration per unit depth"; // Hardcoded for now
+        
+        NcFile dataFile;
+        dataFile.open( filename.c_str(), NcFile::read );
+        NcVar ncvar = dataFile.getVar(varName.c_str());
+        if (ncvar.isNull()) {
+            throw std::runtime_error("Variable not found in NetCDF file");
+        }
+
+        // Read dimensions from file
+        int nx = static_cast<int>(dataFile.getDim("x").getSize());
+        int ny = static_cast<int>(dataFile.getDim("z").getSize());
+
+        // Assert that the grid at least matches the dimensions of the data
+        assert(nx == static_cast<int>(xEdges.size()) - 1);
+        assert(ny == static_cast<int>(yEdges.size()) - 1);
+
+        // Read data into a flat vector
+        std::vector<double> flatData(nx * ny);
+        ncvar.getVar(flatData.data());
+
+        // Convert to 2D vector and record the "mass"
+        Vector_2D gridPDF(ny, std::vector<double>(nx));
+        double newMass = 0;
+        for (size_t j = 0; j < ny; ++j) {
+            for (size_t i = 0; i < nx; ++i) {
+                double yCenter = (yEdges[j+1] + yEdges[j]) / 2;
+                double xCenter = (xEdges[i+1] + xEdges[i]) / 2;
+                double cellArea = (yEdges[j+1] - yEdges[j]) * (xEdges[i+1] - xEdges[i]);
+                gridPDF[j][i] = flatData[ny*i + j]; // Assuming data is stored in x, z (y)
+                newMass += gridPDF[j][i] * cellArea * logBinRatio;
+            }
+        }
+
+        //We have no guarantees on the integral of the function, so need to scale to conserve mass
+        double scalingFactor = mass / newMass;
+        #pragma omp parallel for
+        for(int j = 0; j < ny; j++) {
+            for (int i = 0; i < nx; i++) {
+                gridPDF[j][i] *= scalingFactor;
+            }
+        }
+        return gridPDF;
     }
 
     Vector_2D initVarToGridGaussian(double mass, const Vector_1D& xEdges, const Vector_1D& yEdges, double x0, double y0,
