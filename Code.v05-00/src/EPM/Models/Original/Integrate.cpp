@@ -368,11 +368,11 @@ namespace EPM::Models
         }
         /* Output variables */
         /* Check if contrail is water supersaturated at some point during formation */
-        if ( !simVars_.CHEMISTRY && !observer.checkwatersat() ) {
-            std::cout << "EndSim: Never reaches water saturation... ending simulation" << std::endl;
-            //exit(0);
-            return SimStatus::NoWaterSaturation;
-        }
+        // if ( !simVars_.CHEMISTRY && !observer.checkwatersat() ) {
+        //     std::cout << "EndSim: Never reaches water saturation... ending simulation" << std::endl;
+        //     //exit(0);
+        //     return SimStatus::NoWaterSaturation;
+        // }
 
         /* Persistent contrail */
         if ( relHumidity_i_Final >= 1.0 ) {
