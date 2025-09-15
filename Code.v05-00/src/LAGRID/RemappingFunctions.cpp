@@ -296,7 +296,7 @@ namespace LAGRID {
             throw std::runtime_error("Variable not found in NetCDF file");
         }
 
-        int nbins = static_cast<int>(dataFile.getVar(varName_partnum.c_str()).getSize());
+        int nbins = static_cast<int>(dataFile.getDim("r").getSize());
         std::vector<double> numparts_bin(nbins);
         ncvar2.getVar(numparts_bin.data());
 
