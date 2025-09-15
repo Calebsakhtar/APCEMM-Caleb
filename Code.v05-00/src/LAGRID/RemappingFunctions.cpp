@@ -287,7 +287,7 @@ namespace LAGRID {
                 double xCenter = (xEdges[i+1] + xEdges[i]) / 2;
                 double cellArea = (yEdges[j+1] - yEdges[j]) * (xEdges[i+1] - xEdges[i]);
                 gridPDF[j][i] = flatData[ny*i + j]; // Assuming data is stored in x, z (y)
-                newMass += gridPDF[j][i] * cellArea * logBinRatio;
+                newMass += gridPDF[j][i] * cellArea * logBinRatio * 1e6; // Convert grid PDF from #/cm^3 to #/m^3 (newMass in #/m)
             }
         }
 
@@ -300,7 +300,7 @@ namespace LAGRID {
         std::vector<double> numparts_bin(nbins);
         ncvar2.getVar(numparts_bin.data());
 
-        const double mass = numparts_bin[nbin];
+        const double mass = numparts_bin[nbin]; // #/m
 
         //We have no guarantees on the integral of the function, so need to scale to conserve mass
         double scalingFactor = mass / newMass;
