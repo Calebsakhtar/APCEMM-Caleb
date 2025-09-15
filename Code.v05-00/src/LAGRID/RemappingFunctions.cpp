@@ -250,17 +250,19 @@ namespace LAGRID {
         return initVarToGrid(mass, xEdges, yEdges, rectFunc, logBinRatio);
     }
 
-    Vector_2D initVarToGridCustom(double mass, const Vector_1D& xEdges, const Vector_1D& yEdges,
+    Vector_2D initVarToGridCustom(double nbin, const Vector_1D& xEdges, const Vector_1D& yEdges,
         double logBinRatio, const std::string filename)
     {
         // NOTE: ANY CUSTOM INPUT USED HERE MUST MATCH THE GRID DEFINED IN input.yaml
 
-        std::string varName = "number_concentration per unit depth"; // Hardcoded for now
+        std::string varName_profile = "number_concentration per unit depth";
+        std::string varName_partnum = "numparts_bin";
         
         NcFile dataFile;
         dataFile.open( filename.c_str(), NcFile::read );
-        NcVar ncvar = dataFile.getVar(varName.c_str());
-        if (ncvar.isNull()) {
+        
+        NcVar ncvar1 = dataFile.getVar(varName_profile.c_str());
+        if (ncvar1.isNull()) {
             throw std::runtime_error("Variable not found in NetCDF file");
         }
 
@@ -272,9 +274,9 @@ namespace LAGRID {
         assert(nx == static_cast<int>(xEdges.size()) - 1);
         assert(ny == static_cast<int>(yEdges.size()) - 1);
 
-        // Read data into a flat vector
+        // Read profile data into a flat vector
         std::vector<double> flatData(nx * ny);
-        ncvar.getVar(flatData.data());
+        ncvar1.getVar(flatData.data());
 
         // Convert to 2D vector and record the "mass"
         Vector_2D gridPDF(ny, std::vector<double>(nx));
@@ -288,6 +290,17 @@ namespace LAGRID {
                 newMass += gridPDF[j][i] * cellArea * logBinRatio;
             }
         }
+
+        NcVar ncvar2 = dataFile.getVar(varName_partnum.c_str());
+        if (ncvar2.isNull()) {
+            throw std::runtime_error("Variable not found in NetCDF file");
+        }
+
+        int nbins = static_cast<int>(dataFile.getVar(varName_partnum.c_str()).getSize());
+        std::vector<double> numparts_bin(nbins);
+        ncvar2.getVar(numparts_bin.data());
+
+        const double mass = numparts_bin[nbin];
 
         //We have no guarantees on the integral of the function, so need to scale to conserve mass
         double scalingFactor = mass / newMass;

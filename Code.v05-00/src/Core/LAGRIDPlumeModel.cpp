@@ -309,7 +309,7 @@ void LAGRIDPlumeModel::initializeGrid(const EPM::Output &epmOut) {
         for (UInt n = 0; n < iceAerosol_.getNBin(); n++) {
             double EPM_nPart_bin = epmIceAer.binMoment(n) * epmOut.area;
             double logBinRatio = log(iceAerosol_.getBinEdges()[n+1] / iceAerosol_.getBinEdges()[n]);
-            pdf_init.push_back( LAGRID::initVarToGridCustom(EPM_nPart_bin, xEdges_, yEdges_, logBinRatio, optInput_.ADV_EP_DIST_FILENAME) );
+            pdf_init.push_back( LAGRID::initVarToGridCustom(n, xEdges_, yEdges_, logBinRatio, optInput_.ADV_EP_DIST_FILENAME) );
         }
     }
     else {
