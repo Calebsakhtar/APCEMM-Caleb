@@ -255,7 +255,7 @@ namespace LAGRID {
     {
         // NOTE: ANY CUSTOM INPUT USED HERE MUST MATCH THE GRID DEFINED IN input.yaml
 
-        std::string varName_profile = "number_concentration per unit depth";
+        std::string varName_profile = "2D_numparts_bin";
         std::string varName_partnum = "numparts_bin";
         
         NcFile dataFile;
@@ -269,14 +269,20 @@ namespace LAGRID {
         // Read dimensions from file
         int nx = static_cast<int>(dataFile.getDim("x").getSize());
         int ny = static_cast<int>(dataFile.getDim("z").getSize());
+        int nr = static_cast<int>(dataFile.getDim("r").getSize());
 
         // Assert that the grid at least matches the dimensions of the data
         assert(nx == static_cast<int>(xEdges.size()) - 1);
         assert(ny == static_cast<int>(yEdges.size()) - 1);
 
         // Read profile data into a flat vector
-        std::vector<double> flatData(nx * ny);
+        std::vector<double> flatData(nr * nx * ny);
         ncvar1.getVar(flatData.data());
+
+        // Calculate the starting index and ending index for the desired bin
+        int idx_start = nbin * (nx * ny);
+        int idx_end = (nbin + 1) * (nx * ny);
+        std::vector<double> flatSlice(flatData.begin() + idx_start, flatData.begin() + idx_end);
 
         // Convert to 2D vector and record the "mass"
         Vector_2D gridPDF(ny, std::vector<double>(nx));
@@ -286,8 +292,8 @@ namespace LAGRID {
                 double yCenter = (yEdges[j+1] + yEdges[j]) / 2;
                 double xCenter = (xEdges[i+1] + xEdges[i]) / 2;
                 double cellArea = (yEdges[j+1] - yEdges[j]) * (xEdges[i+1] - xEdges[i]);
-                gridPDF[j][i] = flatData[ny*i + j]; // Assuming data is stored in x, z (y)
-                newMass += gridPDF[j][i] * cellArea * logBinRatio * 1e6; // Convert grid PDF from #/cm^3 to #/m^3 (newMass in #/m)
+                gridPDF[j][i] = flatSlice[ny*i + j]; // Assuming data is stored in x, z (y)
+                newMass += gridPDF[j][i] * cellArea * logBinRatio * 1e6; // Necessary even if input file is already in #/m because this is how a moment is calculated. Inconsistency is accounted for in scaling below.
             }
         }
 
