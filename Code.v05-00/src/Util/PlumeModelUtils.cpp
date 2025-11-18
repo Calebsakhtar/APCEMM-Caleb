@@ -154,6 +154,8 @@ namespace PlumeModelUtils {
         else if ( DPROF == 3 ) {
             d_x = D_X;
             d_y = D_Y;
+            std::cout << "d_x = " << d_x << " [m^2/s]" << "\n";
+            std::cout << "d_y = " << d_y << " [m^2/s]" << "\n";
         }
         else {
             std::string const currFile("DiffParam.cpp");
