@@ -151,6 +151,10 @@ namespace PlumeModelUtils {
             d_x = D_X + (1.13 * D_X - D_X) * exp( -time / tH0 );
             d_y = D_Y + (7.00 * D_Y - D_Y) * exp( -time / tV0 );
         }
+        else if ( DPROF == 3 ) {
+            d_x = D_X;
+            d_y = D_Y;
+        }
         else {
             std::string const currFile("DiffParam.cpp");
             std::cout << "ERROR: In " << currFile << ": DPROF set to " << DPROF << "\n";

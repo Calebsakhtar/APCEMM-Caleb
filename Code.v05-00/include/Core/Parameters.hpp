@@ -37,10 +37,11 @@
 //#define DV0               1.1E-01     /* Initial vertical diffusion parameter [m2/s] */
 #define tH0               7.8E+02     /* Timescale of initial enhanced horizontal diffusion [s] */
 #define tV0               7.8E+02     /* Timescale of initial enhanced vertical diffusion [s] */
-#define DPROF             1           /* Time profile of the initial diffusion parameter [0,1,2]
+#define DPROF             3           /* Time profile of the initial diffusion parameter [0,1,2,3]
                                        * 0: Step
                                        * 1: Linear
-                                       * 2: Exponential */
+                                       * 2: Exponential
+                                       * 3: Constant */
 
 /* Advection  */
 #define VX                0.0E+00     /* Steady-state horizontal advection velocity [m/s] */
