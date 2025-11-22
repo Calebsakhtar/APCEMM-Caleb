@@ -26,9 +26,11 @@ namespace EPM {
         double area;
         double bypassArea;
         double coreExitTemp;
+        AIM::Coagulation PA_Kernel;
 
         void write(std::string filename) const;
         void read(std::string filename);
+        void update_kernel_PA(const AIM::Coagulation &kernel) { PA_Kernel = kernel; }
     };
 
     namespace Models {

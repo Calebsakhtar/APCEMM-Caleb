@@ -173,6 +173,11 @@ void Solution::Initialize(std::string fileName,
 
         solidAerosol = PAAerosol;
     }
+
+    const AIM::Coagulation kernel2( "ice", PA_rJ, PA_vJ, physConst::RHO_ICE, \
+                                    met_.tempRef(), input.pressure_Pa() );
+
+    PA_Kernel = kernel2;
 } /* End of Solution::Initialize */
 
 void Solution::processInputBackgroundLine(std::istream &s, Vector_1D &amb_Value, Vector_2D &aer_Value) {

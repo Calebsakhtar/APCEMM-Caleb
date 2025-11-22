@@ -114,6 +114,12 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         solarTime_h_ = ( timestepVars_.curr_Time_s + timestepVars_.TRANSPORT_DT / 2 ) / 3600.0;
         simTime_h_ = ( timestepVars_.curr_Time_s + timestepVars_.TRANSPORT_DT / 2 - timestepVars_.timeArray[0] ) / 3600;
 
+        if (simVars_.ICE_COAG && timestepVars_.checkTimeForIceCoag()) {
+            std::cout << "Running solid coagulation..." << std::endl;
+            timestepVars_.lastTimeIceCoag = timestepVars_.curr_Time_s + timestepVars_.dt;
+            iceAerosol_.Coagulate( timestepVars_.COAG_DT, kernelPA_, simVars_.PA_MICROPHYSICS(), 0 );
+        }
+
         // Run Ice Growth
         if (simVars_.ICE_GROWTH && timestepVars_.checkTimeForIceGrowth()) {
             std::cout << "Running ice growth..." << std::endl;
@@ -227,6 +233,7 @@ std::variant<EPM::Output, SimStatus> LAGRIDPlumeModel::runEPM() {
     }
     EPM::Output &epmOutput = std::get<EPM::Output>(epmResult);
     epmOutput.write(optInput_.SIMULATION_OUTPUT_FOLDER + "/epm-output.nc");
+    kernelPA_ = epmOutput.PA_Kernel;
 
     /* The output area from the EPM is principally used just to scale from
     number densities (eg #/cm3) to totals (eg #/m). Increasing the area

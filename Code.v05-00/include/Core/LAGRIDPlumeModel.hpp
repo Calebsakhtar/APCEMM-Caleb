@@ -44,6 +44,7 @@ class LAGRIDPlumeModel {
         MPMSimVarsWrapper simVars_;
         TimestepVarsWrapper timestepVars_;
         AIM::Grid_Aerosol iceAerosol_;
+        AIM::Coagulation kernelPA_;
         Meteorology met_;
         Vector_2D diffCoeffX_;
         Vector_2D diffCoeffY_;

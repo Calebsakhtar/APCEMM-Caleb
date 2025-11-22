@@ -46,8 +46,16 @@ std::variant<EPM::Output, SimStatus> Original::run() {
     // structure at indices i, j
     epmSolution.getData(VAR_, i_0, j_0);
 
+    std::variant<EPM::Output, SimStatus> result = Integrate(epmSolution.getSootDensity());
+
+    if (std::holds_alternative<EPM::Output>(result)) {
+        EPM::Output& output = std::get<EPM::Output>(result);
+
+        output.update_kernel_PA(epmSolution.PA_Kernel);
+    }
+
     // Run EPM.
-    return Integrate(epmSolution.getSootDensity());
+    return result;
 }
 
 } // namespace EPM::Models
