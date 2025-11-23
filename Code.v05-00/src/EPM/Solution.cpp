@@ -175,7 +175,7 @@ void Solution::Initialize(std::string fileName,
     }
 
     const AIM::Coagulation kernel2( "ice", PA_rJ, PA_vJ, physConst::RHO_ICE, \
-                                    met_.tempRef(), input.pressure_Pa() );
+                                    input.temperature_K(), input.pressure_Pa() );
 
     PA_Kernel = kernel2;
 } /* End of Solution::Initialize */
