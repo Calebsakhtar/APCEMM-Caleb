@@ -309,7 +309,12 @@ namespace LAGRID {
         const double mass = numparts_bin[nbin]; // #/m
 
         //We have no guarantees on the integral of the function, so need to scale to conserve mass
-        double scalingFactor = mass / newMass;
+        // Note that when using SIPs, it is possible that newMass is zero if no particles are present in that bin.
+        double scalingFactor = 0;
+        if (newMass != 0) {
+            scalingFactor = mass / newMass; 
+        }
+
         #pragma omp parallel for
         for(int j = 0; j < ny; j++) {
             for (int i = 0; i < nx; i++) {
