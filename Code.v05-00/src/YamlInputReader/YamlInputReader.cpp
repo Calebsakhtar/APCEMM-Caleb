@@ -315,8 +315,8 @@ namespace YamlInputReader{
             throw std::invalid_argument("No values in GRID SUBMENU can be less than zero!");
         }
 
-        if (earlyPlumeSubmenu["Kelvin effect constant (double)"]) {
-            input.ADV_KELVIN_EFFECT_CONSTANT = parseDoubleString(earlyPlumeSubmenu["Kelvin effect constant (double)"].as<string>(), "Kelvin effect constant (double)");
+        if (advancedNode["Kelvin effect constant (double)"]) {
+            input.ADV_KELVIN_EFFECT_CONSTANT = parseDoubleString(advancedNode["Kelvin effect constant (double)"].as<string>(), "Kelvin effect constant (double)");
         } else {
             input.ADV_KELVIN_EFFECT_CONSTANT = -1.0; // Use default value in solver
         }
