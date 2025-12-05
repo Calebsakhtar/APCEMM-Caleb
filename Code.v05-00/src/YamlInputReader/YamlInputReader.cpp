@@ -315,6 +315,12 @@ namespace YamlInputReader{
             throw std::invalid_argument("No values in GRID SUBMENU can be less than zero!");
         }
 
+        if (earlyPlumeSubmenu["Kelvin effect constant (double)"]) {
+            input.ADV_KELVIN_EFFECT_CONSTANT = parseDoubleString(earlyPlumeSubmenu["Kelvin effect constant (double)"].as<string>(), "Kelvin effect constant (double)");
+        } else {
+            input.ADV_KELVIN_EFFECT_CONSTANT = -1.0; // Use default value in solver
+        }
+
         if (advancedNode["EARLY PLUME SUBMENU"]){
             YAML::Node earlyPlumeSubmenu = advancedNode["EARLY PLUME SUBMENU"];
             input.ADV_EP_N_REF = parseDoubleString(earlyPlumeSubmenu["Reference ice crystal count [#/m] (double)"].as<string>(), "Reference ice crystal count [#/m] (double)");
