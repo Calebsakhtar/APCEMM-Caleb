@@ -687,6 +687,21 @@ namespace physFunc
 
     } /* End of LHeatSubl_H2O */
 
+    /* Anonymous namespace for module-private Kelvin constant */
+    namespace {
+        /* The parameter a_k is taken from:
+         * (J. Picot et al., Large-eddy simulation of contrail evolution in the vortex phase 
+         * and its interaction with atmospheric turbulence, Atmospheric Chemistry and Physics, 2015)*/
+        double a_k = 5.00E-10; /* [m] */
+    } /* End of anonymous namespace */
+
+    void setKelvinConstant( const double a_k_ip )
+    {
+        /* DESCRIPTION:
+         * Sets the Kelvin constant. Call during initialization to override default. */
+        a_k = a_k_ip;
+    } /* End of setKelvinConstant */
+
     double Kelvin( const double r )
     {
         
@@ -698,12 +713,6 @@ namespace physFunc
          *
          * OUTPUT PARAMETERS:
          * - double :: Dimensionless Kelvin factor */
-
-        /* The parameter a_k is taken from:
-         * (J. Picot et al., Large-eddy simulation of contrail evolution in the vortex phase 
-         * and its interaction with atmospheric turbulence, Atmospheric Chemistry and Physics, 2015)*/
-
-        static const double a_k = 5.00E-10; /* [m] */
 
         return exp( a_k / r );
 

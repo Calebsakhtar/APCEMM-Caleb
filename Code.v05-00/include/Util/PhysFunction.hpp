@@ -121,6 +121,9 @@ namespace physFunc
     /* Latent heat of sublimation of water vapor in [J/kg] */
     double LHeatSubl_H2O( const double T );
 
+    /* Set Kelvin constant [-] */
+    void setKelvinConstant( const double a_k_ip );
+
     /* Kelvin factor [-] */
     double Kelvin( const double r );
 
