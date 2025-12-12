@@ -291,6 +291,12 @@ namespace YamlInputReader{
     }
 
     void readAdvancedMenu(OptInput& input, const YAML::Node& advancedNode) {
+        if (advancedNode["Save gridded particle size distribution (T/F)"]){
+            input.ADV_SAVE_PSD_GRID = parseBoolString(advancedNode["Save gridded particle size distribution (T/F)"].as<string>(), "Save gridded particle size distribution (T/F)");
+        } else {
+            input.ADV_SAVE_PSD_GRID = false;
+        }
+
         YAML::Node gridSubmenu = advancedNode["GRID SUBMENU"];
         input.ADV_GRID_NX = parseUIntString(gridSubmenu["NX (positive int)"].as<string>(), "NX (positive int)");
         input.ADV_GRID_NY = parseUIntString(gridSubmenu["NY (positive int)"].as<string>(), "NY (positive int)");

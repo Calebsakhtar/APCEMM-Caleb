@@ -31,6 +31,7 @@
 #include "Core/Input.hpp"
 #include "Core/LAGRIDPlumeModel.hpp"
 #include "Core/Status.hpp"
+#include "Core/Diag_Mod.hpp"
 #include "Util/MC_Rand.hpp"
 #include "Util/PhysFunction.hpp"
 
@@ -95,6 +96,10 @@ int main( int argc, char* argv[])
         }
         
         YamlInputReader::readYamlInputFiles( Input_Opt, INPUT_FILE_PATHS );
+
+        if (Input_Opt.ADV_SAVE_PSD_GRID){
+            Diag::set_storePSD(true);
+        }
 
         if ( Input_Opt.ADV_KELVIN_EFFECT_CONSTANT >= 0.0 ) {
             physFunc::setKelvinConstant( Input_Opt.ADV_KELVIN_EFFECT_CONSTANT );
