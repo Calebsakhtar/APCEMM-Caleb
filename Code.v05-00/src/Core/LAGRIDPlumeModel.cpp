@@ -329,39 +329,58 @@ void LAGRIDPlumeModel::initializeGrid(const EPM::Output &epmOut) {
 
 void LAGRIDPlumeModel::initH2O() {
     Contrail_ = Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size()));
-    H2O_ = met_.H2O_field();
-
-    //Add emitted plume H2O. This function is called after releasing the initial crystals into the grid,
-    //so we can use that as a "mask" for where to emit the H2O.
-
     auto maskInfo = VectorUtils::mask(iceAerosol_.TotalNumber(), [](double val) { return val > 1e-4; } );
     auto& mask = maskInfo.first;
-    int nonMaskCount = maskInfo. second;
 
-    auto areas = VectorUtils::cellAreas(xEdges_, yEdges_);
-    const double icemass = iceAerosol_.TotalIceMass_sum(areas);
+    if (optInput_.ADV_EP_HUM_FROM_FILE){
+        // Load H2O field from file
+        H2O_ = LAGRID::initH2OCustom(xEdges_, yEdges_, optInput_.ADV_EP_HUM_FILENAME);
 
-    double mass_WV = WV_exhaust_ - icemass;
-    double E_H2O = mass_WV / (MW_H2O * 1e3) * Na;
-
-    // Spread the emitted water evenly over the cells that contain ice crystals
-    auto localPlumeEmission = [&](std::size_t j, std::size_t i) -> double {
-        if(mask[j][i] == 0) return 0;
-        return E_H2O * 1.0E-06 / ( nonMaskCount * areas[j][i] );
-    };
-    //Set the H2O field to the plume H2O, and mark locations with 1 or 0 to indicate
-    //the presence of contrail ice
-    for(std::size_t j = 0; j < mask.size(); j++) {
-        for(std::size_t i = 0; i < mask[0].size(); i++) {
-            if(mask[j][i] == 1) {
-                double localPlumeH2O = localPlumeEmission(j, i);
-                H2O_[j][i] += localPlumeH2O;
-                Contrail_[j][i] = 1.0;
-            } else {
-                Contrail_[j][i] = 0.0;
+        //Mark locations with 1 or 0 to indicate the presence of contrail ice
+        for(std::size_t j = 0; j < mask.size(); j++) {
+            for(std::size_t i = 0; i < mask[0].size(); i++) {
+                if(mask[j][i] == 1) {
+                    Contrail_[j][i] = 1.0;
+                } else {
+                    Contrail_[j][i] = 0.0;
+                }
             }
         }
     }
+    else {
+        H2O_ = met_.H2O_field();
+
+        //Add emitted plume H2O. This function is called after releasing the initial crystals into the grid,
+        //so we can use that as a "mask" for where to emit the H2O.
+        int nonMaskCount = maskInfo. second;
+
+        auto areas = VectorUtils::cellAreas(xEdges_, yEdges_);
+        const double icemass = iceAerosol_.TotalIceMass_sum(areas);
+
+        double mass_WV = WV_exhaust_ - icemass;
+        double E_H2O = mass_WV / (MW_H2O * 1e3) * Na;
+
+        // Spread the emitted water evenly over the cells that contain ice crystals
+        auto localPlumeEmission = [&](std::size_t j, std::size_t i) -> double {
+            if(mask[j][i] == 0) return 0;
+            return E_H2O * 1.0E-06 / ( nonMaskCount * areas[j][i] );
+        };
+
+        //Set the H2O field to the plume H2O, and mark locations with 1 or 0 to indicate
+        //the presence of contrail ice
+        for(std::size_t j = 0; j < mask.size(); j++) {
+            for(std::size_t i = 0; i < mask[0].size(); i++) {
+                if(mask[j][i] == 1) {
+                    double localPlumeH2O = localPlumeEmission(j, i);
+                    H2O_[j][i] += localPlumeH2O;
+                    Contrail_[j][i] = 1.0;
+                } else {
+                    Contrail_[j][i] = 0.0;
+                }
+            }
+        }
+    }
+
 }
 
 void LAGRIDPlumeModel::updateDiffVecs() {
