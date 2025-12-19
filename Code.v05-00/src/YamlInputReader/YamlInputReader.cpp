@@ -353,6 +353,13 @@ namespace YamlInputReader{
                 input.ADV_EP_DIST_FROM_FILE = false;
                 input.ADV_EP_DIST_FILENAME = "";
             }
+            if (earlyPlumeSubmenu["Override post-vortex humidity field (T/F)"]) {
+                input.ADV_EP_HUM_FROM_FILE = parseBoolString(earlyPlumeSubmenu["Override post-vortex humidity field (T/F)"].as<string>(), "Override post-vortex humidity field (T/F)");
+                input.ADV_EP_HUM_FILENAME = parseFileSystemPath(earlyPlumeSubmenu["Post-vortex humidity field filename (string)"].as<string>());
+            } else {
+                input.ADV_EP_HUM_FROM_FILE = false;
+                input.ADV_EP_HUM_FILENAME = "";
+            }
         } else {
             input.ADV_EP_N_REF = 3.38e12;
             input.ADV_EP_WINGSPAN_REF = 60.3;
