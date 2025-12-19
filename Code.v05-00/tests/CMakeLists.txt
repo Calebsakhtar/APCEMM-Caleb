@@ -24,5 +24,5 @@ target_link_libraries(test_solver  Catch2::Catch2WithMain FVM_ANDS Core LAGRID O
 catch_discover_tests(test_solver)
 
 add_executable(test_LAGRID test_LAGRID.cpp)
-target_link_libraries(test_LAGRID  Catch2::Catch2WithMain LAGRID)
+target_link_libraries(test_LAGRID  Catch2::Catch2WithMain LAGRID Util)
 catch_discover_tests(test_LAGRID)
