@@ -91,6 +91,8 @@ namespace LAGRID {
 
     Vector_2D initVarToGridBimodalY(double mass, const Vector_1D& xEdges, const Vector_1D& yEdges, double x0, double y0,
                                     double width, double depth, double logBinRatio = 1);
+
+    Vector_2D initH2OCustom(const Vector_1D& xEdges, const Vector_1D& yEdges, const std::string filename);
 }
 
 #endif

@@ -3,6 +3,7 @@
 #include <netcdf>
 #include <cassert>
 #include "Util/PhysConstant.hpp"
+#include "Util/PhysFunction.hpp"
 #include "LAGRID/RemappingFunctions.hpp"
 
 using namespace netCDF;
@@ -342,6 +343,53 @@ namespace LAGRID {
             return exp(- (pow(x - x0, 2.0) / (2.0 * sigmaX * sigmaX) )) * ( std::abs(y - y0) < depth/2 ) * std::abs( std::sin(omega * (y - y0)) );
         };
         return initVarToGrid(mass, xEdges, yEdges, func, logBinRatio);    
+    }
+
+    Vector_2D initH2OCustom(const Vector_1D& xEdges, const Vector_1D& yEdges, const std::string filename)
+    {
+        // NOTE: ANY CUSTOM INPUT USED HERE MUST MATCH THE GRID DEFINED IN input.yaml
+
+        std::string varName_RHi = "RHi";
+        std::string varName_T = "T";
+        
+        NcFile dataFile;
+        dataFile.open( filename.c_str(), NcFile::read );
+        
+        NcVar ncvar1 = dataFile.getVar(varName_RHi.c_str());
+        if (ncvar1.isNull()) {
+            throw std::runtime_error("Variable not found in NetCDF file");
+        }
+
+        NcVar ncvar2 = dataFile.getVar(varName_T.c_str());
+        if (ncvar2.isNull()) {
+            throw std::runtime_error("Variable not found in NetCDF file");
+        }
+
+        // Read dimensions from file
+        int nx = static_cast<int>(dataFile.getDim("x").getSize());
+        int ny = static_cast<int>(dataFile.getDim("z").getSize());
+
+        // Assert that the grid at least matches the dimensions of the data
+        assert(nx == static_cast<int>(xEdges.size()) - 1);
+        assert(ny == static_cast<int>(yEdges.size()) - 1);
+
+        // Read RHi profile data into a flat vector
+        std::vector<double> flatDataRHi(nx * ny);
+        ncvar1.getVar(flatDataRHi.data());
+
+        // Read temperature profile data into a flat vector
+        std::vector<double> flatDataTemp(nx * ny);
+        ncvar2.getVar(flatDataTemp.data());
+
+        // Convert to 2D vector
+        Vector_2D gridH2O(ny, std::vector<double>(nx));
+        for (size_t j = 0; j < ny; ++j) {
+            for (size_t i = 0; i < nx; ++i) {
+                gridH2O[j][i] = physFunc::RHiToH2O(flatDataRHi[ny*i + j], flatDataTemp[ny*i + j]);
+            }
+        }
+
+        return gridH2O;
     }
 
 }
