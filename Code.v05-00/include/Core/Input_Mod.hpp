@@ -161,8 +161,10 @@ struct OptInput
     double ADV_EP_N_POSTVORTEX;
     bool ADV_EP_DIST_FROM_FILE;
     std::string ADV_EP_DIST_FILENAME;
+    bool ADV_EP_HUM_FROM_FILE;
+    std::string ADV_EP_HUM_FILENAME;
     double ADV_KELVIN_EFFECT_CONSTANT;
-    bool ADV_SAVE_PSD_GRID;
+    bool ADV_SAVE_PSD_GRID;                
 };
 
 #endif /* INPUT_MOD_H_INCLUDED */
