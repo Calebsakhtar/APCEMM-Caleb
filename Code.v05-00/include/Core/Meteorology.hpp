@@ -52,6 +52,7 @@ class Meteorology
                      const double simTime_h, const double dTrav_x = 0, const double dTrav_y = 0);
         
         void updateTempPerturb();
+        inline void updateTempTotalFromCustom(const Vector_2D& customTemp) {tempTotal_ = customTemp;}
         inline double alt( int j ) const { return altitude_[j]; }
 	    inline double press( int j ) const { return pressure_[j]; }
         inline double shear( int j ) const { return shear_[j]; }
