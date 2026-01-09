@@ -333,6 +333,8 @@ void LAGRIDPlumeModel::initH2O() {
     auto& mask = maskInfo.first;
 
     if (optInput_.ADV_EP_HUM_FROM_FILE){
+        Vector_2D tempCustom = LAGRID::initTempCustom(xEdges_, yEdges_, optInput_.ADV_EP_TEMP_FILENAME);
+        met_.updateTempTotalFromCustom(tempCustom);
         // Load H2O field from file
         H2O_ = LAGRID::initH2OCustom(xEdges_, yEdges_, optInput_.ADV_EP_HUM_FILENAME);
 
