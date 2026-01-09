@@ -392,4 +392,40 @@ namespace LAGRID {
         return gridH2O;
     }
 
+    Vector_2D initTempCustom(const Vector_1D& xEdges, const Vector_1D& yEdges, const std::string filename)
+    {
+        // NOTE: ANY CUSTOM INPUT USED HERE MUST MATCH THE GRID DEFINED IN input.yaml
+        std::string varName_T = "T";
+        
+        NcFile dataFile;
+        dataFile.open( filename.c_str(), NcFile::read );
+
+        NcVar ncvar2 = dataFile.getVar(varName_T.c_str());
+        if (ncvar2.isNull()) {
+            throw std::runtime_error("Variable not found in NetCDF file");
+        }
+
+        // Read dimensions from file
+        int nx = static_cast<int>(dataFile.getDim("x").getSize());
+        int ny = static_cast<int>(dataFile.getDim("z").getSize());
+
+        // Assert that the grid at least matches the dimensions of the data
+        assert(nx == static_cast<int>(xEdges.size()) - 1);
+        assert(ny == static_cast<int>(yEdges.size()) - 1);
+
+        // Read temperature profile data into a flat vector
+        std::vector<double> flatDataTemp(nx * ny);
+        ncvar2.getVar(flatDataTemp.data());
+
+        // Convert to 2D vector
+        Vector_2D gridTemp(ny, std::vector<double>(nx));
+        for (size_t j = 0; j < ny; ++j) {
+            for (size_t i = 0; i < nx; ++i) {
+                gridTemp[j][i] = flatDataTemp[ny*i + j];
+            }
+        }
+
+        return gridTemp;
+    }
+
 }

@@ -93,6 +93,8 @@ namespace LAGRID {
                                     double width, double depth, double logBinRatio = 1);
 
     Vector_2D initH2OCustom(const Vector_1D& xEdges, const Vector_1D& yEdges, const std::string filename);
+
+    Vector_2D initTempCustom(const Vector_1D& xEdges, const Vector_1D& yEdges, const std::string filename);
 }
 
 #endif
