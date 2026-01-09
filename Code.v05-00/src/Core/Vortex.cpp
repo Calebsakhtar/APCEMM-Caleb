@@ -109,7 +109,7 @@ Vortex::Vortex( double RHi_PC, double temperature_K, double pressure_Pa,  \
 
     /* Compute the remaining fraction of ice crystals, from Eq. 12 in LU2025 */
     icenum_survfrac_ = beta_0_ + beta_1_ / physConst::PI * atan( alpha_0_ + z_delta_fns_ / 1.0E+02 );
-    icenum_survfrac_ = std::min( std::max( icenum_survfrac_, 0.0E+00 ), 1.0E+00 );
+    icenum_survfrac_ = 1.E00;
 
     if ( icenum_survfrac_ == 0.0E+00 )
         std::cout << "Contrail has fully melted because of vortex-sinking losses" << std::endl;

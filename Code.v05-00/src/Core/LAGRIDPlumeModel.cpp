@@ -374,7 +374,7 @@ void LAGRIDPlumeModel::initH2O() {
             for(std::size_t i = 0; i < mask[0].size(); i++) {
                 if(mask[j][i] == 1) {
                     double localPlumeH2O = localPlumeEmission(j, i);
-                    H2O_[j][i] += localPlumeH2O;
+                    // H2O_[j][i] += localPlumeH2O;
                     Contrail_[j][i] = 1.0;
                 } else {
                     Contrail_[j][i] = 0.0;

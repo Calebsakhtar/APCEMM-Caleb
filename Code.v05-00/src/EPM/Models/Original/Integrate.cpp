@@ -389,8 +389,8 @@ namespace EPM::Models
              Ice_den  = 0.0;
              Soot_den = PartDens_3mins;
              H2O_mol  = H2OMol_3mins;
-             std::cout << "No persistent contrail..." << std::endl;
-             if (!simVars_.CHEMISTRY) return SimStatus::NoPersistence;
+            //  std::cout << "No persistent contrail..." << std::endl;
+            //  if (!simVars_.CHEMISTRY) return SimStatus::NoPersistence;
         }
 	    std::cout << "Ice_den=" << Ice_den << std::endl;
 
